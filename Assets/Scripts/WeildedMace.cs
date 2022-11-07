@@ -4,11 +4,13 @@ using UnityEngine;
 
 public class WeildedMace : MonoBehaviour
 {
-    SkinnedMeshRenderer meshRenderer;
+    public SkinnedMeshRenderer meshRenderer;
+    public Rigidbody rb;
     // Start is called before the first frame update
     void Start()
     {
         meshRenderer = GetComponent<SkinnedMeshRenderer>();
+        rb  = gameObject.GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -20,5 +22,6 @@ public class WeildedMace : MonoBehaviour
     public void SetVisible(bool isVisible)
     {
         meshRenderer.enabled = isVisible;
+        
     }
 }

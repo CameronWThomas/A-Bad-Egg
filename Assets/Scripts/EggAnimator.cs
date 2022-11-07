@@ -5,21 +5,21 @@ using UnityEngine;
 public class EggAnimator : MonoBehaviour
 {
     public Animator animator;
-    PlayerController playerController;
+    EggPersonController eggPersonController;
     // Start is called before the first frame update
     void Start()
     {
 
         animator = GetComponent<Animator>();
-        playerController = GetComponent<PlayerController>();
+        eggPersonController = GetComponent<EggPersonController>();
     }
 
     // Update is called once per frame
     void Update()
     {
         //speed
-        float animationSpeedPercent = ((playerController.running) ? playerController.currentSpeed / playerController.runSpeed : playerController.currentSpeed / playerController.walkSpeed * .5f);
-        animator.SetFloat("speedPercent", animationSpeedPercent, playerController.speedSmoothTime, Time.deltaTime);
+        float animationSpeedPercent = ((eggPersonController.running) ? eggPersonController.currentSpeed / eggPersonController.runSpeed : eggPersonController.currentSpeed / eggPersonController.walkSpeed * .5f);
+        animator.SetFloat("speedPercent", animationSpeedPercent, eggPersonController.speedSmoothTime, Time.deltaTime);
 
     }
 

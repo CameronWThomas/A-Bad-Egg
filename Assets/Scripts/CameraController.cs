@@ -21,6 +21,7 @@ public class CameraController : MonoBehaviour
     float yaw;
     float pitch;
 
+    bool locked;
 
 
     public float dstFromTarget = 2;
@@ -33,25 +34,34 @@ public class CameraController : MonoBehaviour
         offset = transform.position - player.transform.position;
     }
 
+    void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.L))
+        {
+            locked = !locked;
+        }
+    }
     // Update is called once per frame
     void LateUpdate()
     {
+        if (!locked)
+        {
+            yaw += Input.GetAxis("Mouse X") * mouseSensitivity;
+            pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity;
+            pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
 
-        yaw += Input.GetAxis("Mouse X") * mouseSensitivity;
-        pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-        pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
+            currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
+            transform.eulerAngles = currentRotation;
 
-        currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
-        transform.eulerAngles = currentRotation;
+            //transform.position = player.transform.position + offset;
 
-        //transform.position = player.transform.position + offset;
-
-        transform.position = ( player.transform.position) - transform.forward * dstFromTarget;
+            transform.position = (player.transform.position) - transform.forward * dstFromTarget;
 
 
-        //camera distance
-        dstFromTarget -= Input.mouseScrollDelta.y * scrollScale;
-        dstFromTarget = Mathf.Clamp(dstFromTarget, dstMinMax.x, dstMinMax.y);
+            //camera distance
+            dstFromTarget -= Input.mouseScrollDelta.y * scrollScale;
+            dstFromTarget = Mathf.Clamp(dstFromTarget, dstMinMax.x, dstMinMax.y);
+        }
 
     }
 }
