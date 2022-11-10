@@ -32,6 +32,10 @@ public class EggAnimator : MonoBehaviour
     {
         animator.SetTrigger("swing");
     }
+    public void SetSwinging(bool swinging)
+    {
+        animator.SetBool("swinging", swinging);
+    }
 
     public void OnJumping()
     {

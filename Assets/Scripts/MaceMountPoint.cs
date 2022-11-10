@@ -8,7 +8,7 @@ public class MaceMountPoint : MonoBehaviour
     HandMountPoint handMountPoint;
     Quaternion armedRotation = new Quaternion(-0.456308216f, 0.169321358f, -0.135407642f, 0.863005161f);
     public bool isPlayer = false;
-    bool armed; 
+    public bool armed = false; 
     // Start is called before the first frame update
     void Start()
     {
@@ -31,10 +31,11 @@ public class MaceMountPoint : MonoBehaviour
 
     public void SetArmed()
     {
-
+        /*
         transform.localPosition = Vector3.zero;
         //transform.localRotation = handMountPoint.transform.rotation * -1;
         transform.localRotation = armedRotation;
+        */
         armed = true;
     }
 
@@ -45,11 +46,14 @@ public class MaceMountPoint : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        EggPersonController controller = other.GetComponent<EggPersonController>();
-
-        if(controller != null && other.transform.root.name != transform.root.name) 
+        if (armed)
         {
-            controller.OnHit(Vector3.left * 10);
+            EggPersonController controller = other.GetComponent<EggPersonController>();
+
+            if (controller != null && other.transform.root.name != transform.root.name)
+            {
+                controller.OnHit(Vector3.left * 10000);
+            }
         }
     }
 }

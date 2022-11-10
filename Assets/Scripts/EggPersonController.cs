@@ -37,7 +37,7 @@ public class EggPersonController : MonoBehaviour
 
 
     public WeildedMace myMace;
-
+    public MaceMountPoint mountPoint;
 
     public bool ragdolled = false;
     public List<Rigidbody> ragdollBones;
@@ -54,6 +54,7 @@ public class EggPersonController : MonoBehaviour
     public float ragdollTimer = 3f;
     public float ragdollCounter = 0f;
     public bool isRagdolled;
+    public bool swinging = false;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -63,7 +64,7 @@ public class EggPersonController : MonoBehaviour
         //rb = GetComponent<Rigidbody>();
 
         myMace = GetComponentInChildren<WeildedMace>();
-
+        mountPoint = GetComponentInChildren<MaceMountPoint>();
 
         epc = GetComponentInChildren<EggPersonCore>();
         handMountPoint = GetComponentInChildren<HandMountPoint>();

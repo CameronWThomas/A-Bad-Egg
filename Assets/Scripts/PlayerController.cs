@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     public Camera mainCamera;
     private Transform cameraT;
+    private CameraController camController;
     public EggPersonController eggPersonController;
         
     // Start is called before the first frame update
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour
         eggPersonController = GetComponent<EggPersonController>();
         cameraT = Camera.main.transform;
         mainCamera = Camera.main;
+        camController = mainCamera.GetComponent<CameraController>();
 
     }
 
@@ -49,7 +51,15 @@ public class PlayerController : MonoBehaviour
                 else
                 {
 
-                    Move(inputDir, eggPersonController.running);
+
+                    if (eggPersonController.swinging)
+                    {
+                        SwingMove(inputDir, eggPersonController.running);
+                    }
+                    else
+                    {
+                        Move(inputDir, eggPersonController.running);
+                    }
 
 
                     //armed / unarmed
@@ -58,10 +68,24 @@ public class PlayerController : MonoBehaviour
                         eggPersonController.armed = !eggPersonController.armed;
                         eggPersonController.eggAnimator.SetArmed(eggPersonController.armed);
                         eggPersonController.myMace.SetVisible(eggPersonController.armed);
+                        eggPersonController.mountPoint.armed = eggPersonController.armed;
+                        camController.SetCombatMode(eggPersonController.armed);
                     }
                     if (eggPersonController.armed && Input.GetMouseButtonDown(0))
                     {
-                        eggPersonController.eggAnimator.Swing();
+                        if (!eggPersonController.swinging)
+                        {
+                            eggPersonController.swinging = true;
+                            eggPersonController.eggAnimator.SetSwinging(true);
+                        }
+                    }
+                    if (eggPersonController.armed && Input.GetMouseButtonUp(0))
+                    {
+                        if (eggPersonController.swinging)
+                        {
+                            eggPersonController.swinging = false;
+                            eggPersonController.eggAnimator.SetSwinging(false);
+                        }
                     }
 
                     //jump
@@ -79,6 +103,22 @@ public class PlayerController : MonoBehaviour
             }
         }
         
+    }
+
+
+    private void SwingMove(Vector2 inputDir, bool running)
+    {
+        Vector3 targetForward = cameraT.forward;
+        targetForward.y = transform.forward.y;
+        transform.forward = targetForward;
+        //float targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + cameraT.eulerAngles.y;
+        //transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref eggPersonController.turnSmoothVelocity, eggPersonController.GetModifiedSmoothTime(eggPersonController.turnSmoothTime));
+
+
+        eggPersonController.velocityY += Time.deltaTime * eggPersonController.wm.gravity;
+        Vector3 velocity = transform.forward * eggPersonController.currentSpeed + Vector3.up * eggPersonController.velocityY;
+
+        eggPersonController.controller.Move(velocity * Time.deltaTime);
     }
 
     private void FixedUpdate()

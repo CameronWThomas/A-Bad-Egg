@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public GameObject player;
+    public GameObject target;
+    public GameObject combatTarget;
 
     private Vector3 offset;
 
@@ -23,6 +24,7 @@ public class CameraController : MonoBehaviour
 
     bool locked;
 
+    bool combatMode = false;
 
     public float dstFromTarget = 2;
     public Vector2 dstMinMax = new Vector2(1, 10);
@@ -31,7 +33,7 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        offset = transform.position - player.transform.position;
+        offset = transform.position - target.transform.position;
     }
 
     void Update()
@@ -40,6 +42,10 @@ public class CameraController : MonoBehaviour
         {
             locked = !locked;
         }
+    }
+    public void SetCombatMode(bool engaged)
+    {
+        combatMode = engaged;
     }
     // Update is called once per frame
     void LateUpdate()
@@ -55,7 +61,14 @@ public class CameraController : MonoBehaviour
 
             //transform.position = player.transform.position + offset;
 
-            transform.position = (player.transform.position) - transform.forward * dstFromTarget;
+            if (combatMode)
+            {
+                transform.position = (combatTarget.transform.position) - transform.forward * dstFromTarget;
+            }
+            else
+            {
+                transform.position = (target.transform.position) - transform.forward * dstFromTarget;
+            }
 
 
             //camera distance
