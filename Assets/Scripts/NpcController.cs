@@ -50,7 +50,8 @@ public class NpcController : MonoBehaviour
         }
         else
         {
-            eggPersonController.ToggleRagdoll(true);
+            //eggPersonController.ToggleRagdoll(true);
+            this.enabled = false;
         }
 
 
@@ -62,14 +63,15 @@ public class NpcController : MonoBehaviour
     {
         targetDir = target.position - transform.position;
 
-
+        /*
         lookingAt = Quaternion.LookRotation(targetDir).eulerAngles;
         //rotation
         float targetRotation = lookingAt.y;
         //float targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + cameraT.eulerAngles.y;
         //float targetRotation = Mathf.Rad2Deg * targetDir.y;
         transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref eggPersonController.turnSmoothVelocity, eggPersonController.GetModifiedSmoothTime(eggPersonController.turnSmoothTime));
-
+        */
+        transform.LookAt(targetDir);
         //movement
         float targetSpeed = ((running) ? eggPersonController.runSpeed : eggPersonController.walkSpeed) * 1;
         eggPersonController.currentSpeed = Mathf.SmoothStep(eggPersonController.currentSpeed, targetSpeed, 1f);

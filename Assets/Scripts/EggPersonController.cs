@@ -55,6 +55,11 @@ public class EggPersonController : MonoBehaviour
     public float ragdollCounter = 0f;
     public bool isRagdolled;
     public bool swinging = false;
+
+    public float force;
+    public Vector3 away;
+    public Vector3 impactPoint;
+    ShatteredEggPersonController sepc;
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -84,21 +89,75 @@ public class EggPersonController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(force > 0.5)
+        {
+            force = Mathf.Lerp(force, 0, Time.deltaTime * 4);
 
-
+            away = (epc.transform.position - impactPoint).normalized;
+            epc.rbody.AddForce(away);
+        }
     }
 
-    public void OnHit(Vector3? force = null)
+    public void OnHit(float forceSpeed, Vector3 splodePoint)
     {
-        if (!isRagdolled)
+        if (health == 2)
         {
-            isRagdolled = true;
-            health--;
-            ToggleRagdoll(true);
-            if (force.HasValue)
+            if (!isRagdolled)
             {
-                epc.rbody.AddForce(force.Value);
+                isRagdolled = true;
+                health--;
+                ToggleRagdoll(true);
+                if (forceSpeed > 0)
+                {
+                    impactPoint = splodePoint;
+                    away = (epc.transform.position - splodePoint).normalized;
+                    force = forceSpeed;
+                    epc.rbody.AddForce(away);
+                }
             }
+        }
+        else
+        {
+            if (sepc == null)
+            {
+                SwapToShattered(forceSpeed, splodePoint);
+            }
+        }
+    }
+    public void SwapToShattered(float speed, Vector3 splodePoint)
+    {
+        
+        int count = transform.childCount;
+        for (int i = 0; i < count; i++)
+        {
+            Transform child = transform.GetChild(i);
+            GameObject.Destroy(child.gameObject);
+            // ...
+        }
+        
+        NpcController npc = GetComponent<NpcController>();
+        controller.enabled = false;
+        npc.enabled = false;
+
+        ShatteredEggPersonController[] sepcs = GameObject.FindObjectsOfType<ShatteredEggPersonController>();
+
+        foreach(ShatteredEggPersonController se in sepcs)
+        {
+            if (!se.enabled)
+            {
+                sepc = se;
+                break;
+            }
+        }
+        if (sepc != null)
+        {
+            sepc.transform.position = this.transform.position;
+            sepc.transform.rotation = this.transform.rotation;
+
+            sepc.ImpactPoint = splodePoint;
+            sepc.ImpactSpeed = speed;
+            sepc.EnableGravity();
+            this.enabled = false;
         }
     }
 

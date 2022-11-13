@@ -52,7 +52,7 @@ public class MaceMountPoint : MonoBehaviour
 
             if (controller != null && other.transform.root.name != transform.root.name)
             {
-                controller.OnHit(Vector3.left * 10000);
+                controller.OnHit(20, transform.position);
             }
         }
     }

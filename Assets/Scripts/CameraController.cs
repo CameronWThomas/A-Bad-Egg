@@ -22,7 +22,7 @@ public class CameraController : MonoBehaviour
     float yaw;
     float pitch;
 
-    bool locked;
+    public bool locked;
 
     bool combatMode = false;
 
