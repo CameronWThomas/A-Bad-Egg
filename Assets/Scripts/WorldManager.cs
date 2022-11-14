@@ -5,6 +5,7 @@ using UnityEngine;
 public class WorldManager : MonoBehaviour
 {
     public float gravity = -12;
+    public float mouseSensitivity = 10;
     // Start is called before the first frame update
     void Start()
     {

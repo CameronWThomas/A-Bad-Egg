@@ -11,7 +11,6 @@ public class CameraController : MonoBehaviour
 
     //cust
     public bool lockCursor;
-    public float mouseSensitivity = 10;
 
     public Vector2 pitchMinMax = new Vector2(-40, 85);
 
@@ -30,10 +29,15 @@ public class CameraController : MonoBehaviour
     public Vector2 dstMinMax = new Vector2(1, 10);
     public float scrollScale = 0.3f;
 
+    PlayerController playerController;
+
+    WorldManager worldManager;
     // Start is called before the first frame update
     void Start()
     {
-        offset = transform.position - target.transform.position;
+        //offset = transform.position - target.transform.position;
+        playerController = GameObject.FindObjectOfType<PlayerController>();
+        worldManager = GameObject.FindObjectOfType<WorldManager>();
     }
 
     void Update()
@@ -52,22 +56,27 @@ public class CameraController : MonoBehaviour
     {
         if (!locked)
         {
-            yaw += Input.GetAxis("Mouse X") * mouseSensitivity;
-            pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity;
-            pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
-
-            currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
-            transform.eulerAngles = currentRotation;
+           
 
             //transform.position = player.transform.position + offset;
 
             if (combatMode)
             {
-                transform.position = (combatTarget.transform.position) - transform.forward * dstFromTarget;
+                //transform.position = (combatTarget.transform.position) - transform.forward * dstFromTarget;
+                transform.position = combatTarget.transform.position;
+                transform.forward = playerController.transform.forward;
             }
             else
             {
+                yaw += Input.GetAxis("Mouse X") * worldManager.mouseSensitivity;
+                pitch -= Input.GetAxis("Mouse Y") * worldManager.mouseSensitivity;
+                pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
+
+                currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
+                transform.eulerAngles = currentRotation;
+
                 transform.position = (target.transform.position) - transform.forward * dstFromTarget;
+                //transform.position = target.transform.position;
             }
 
 

@@ -35,6 +35,10 @@ public class EggAnimator : MonoBehaviour
     public void SetSwinging(bool swinging)
     {
         animator.SetBool("swinging", swinging);
+        /*
+        int idx = animator.GetLayerIndex("ArmMask");
+        animator.SetLayerWeight(idx, swinging ? 1f : 0f);
+        */
     }
 
     public void OnJumping()

@@ -5,16 +5,20 @@ using UnityEngine;
 public class CamTarget : MonoBehaviour
 {
     public EggPersonCore core;
-    Vector3 offset;
+    //Vector3 offset;
     // Start is called before the first frame update
     void Start()
     {
-        offset = transform.position - core.transform.position;
+        //offset = transform.position - core.transform.position;
+        if (core != null)
+        {
+            //transform.parent = core.transform;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.position = offset + core.transform.position;
+        //transform.position = offset + core.transform.position;
     }
 }
