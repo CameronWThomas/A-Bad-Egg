@@ -79,7 +79,6 @@ public class PlayerController : MonoBehaviour
                         eggPersonController.armed = !eggPersonController.armed;
                         eggPersonController.eggAnimator.SetArmed(eggPersonController.armed);
                         eggPersonController.myMace.SetVisible(eggPersonController.armed);
-                        eggPersonController.mountPoint.armed = eggPersonController.armed;
                     }
                     if (eggPersonController.armed && Input.GetMouseButtonDown(0))
                     {
@@ -87,6 +86,7 @@ public class PlayerController : MonoBehaviour
                         {
                             SetDefaultYawAndPitch();
                             eggPersonController.swinging = true;
+                            eggPersonController.mountPoint.swinging = true;
                             camController.SetCombatMode(eggPersonController.swinging);
                             eggPersonController.eggAnimator.SetSwinging(true);
                         }
@@ -97,6 +97,7 @@ public class PlayerController : MonoBehaviour
                         {
                             
                             eggPersonController.swinging = false;
+                            eggPersonController.mountPoint.swinging = false;
                             camController.SetCombatMode(eggPersonController.swinging);
                             eggPersonController.eggAnimator.SetSwinging(false);
                             
@@ -120,6 +121,10 @@ public class PlayerController : MonoBehaviour
         
     }
 
+    public bool IsViolent()
+    {
+        return eggPersonController.IsViolent();
+    }
     private void LateUpdate()
     {
 

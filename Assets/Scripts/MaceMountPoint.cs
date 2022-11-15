@@ -4,54 +4,39 @@ using UnityEngine;
 
 public class MaceMountPoint : MonoBehaviour
 {
-    EggPersonController eggPersonController;
     HandMountPoint handMountPoint;
     Quaternion armedRotation = new Quaternion(-0.456308216f, 0.169321358f, -0.135407642f, 0.863005161f);
-    public bool isPlayer = false;
-    public bool armed = false; 
+    public bool swinging = false;
+    public bool VIOLENT = false;
+    public float violentTimer = 0f;
+    public float violentTimerMax = 10f;
     // Start is called before the first frame update
     void Start()
     {
-        //handMountPoint = eggPersonController.handMountPoint;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        /*
-        if (eggPersonController.armed && !armed)
+        if (VIOLENT && violentTimer < violentTimerMax) 
         {
-            //SetArmed();
-        }else if(!eggPersonController.armed && armed)
+            violentTimer += Time.deltaTime;
+        }else if(VIOLENT && violentTimer >= violentTimerMax)
         {
-            //SetUnarmed();
+            VIOLENT = false;
+            violentTimer = 0f;
         }
-        */
-    }
-
-    public void SetArmed()
-    {
-        /*
-        transform.localPosition = Vector3.zero;
-        //transform.localRotation = handMountPoint.transform.rotation * -1;
-        transform.localRotation = armedRotation;
-        */
-        armed = true;
-    }
-
-    public void SetUnarmed()
-    {
-        armed = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (armed)
+
+        if (swinging)
         {
             EggPersonController controller = other.GetComponent<EggPersonController>();
 
             if (controller != null && other.transform.root.name != transform.root.name)
             {
+                VIOLENT = true;
                 controller.OnHit(20, transform.position);
             }
         }

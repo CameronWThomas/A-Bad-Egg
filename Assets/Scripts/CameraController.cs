@@ -63,8 +63,9 @@ public class CameraController : MonoBehaviour
             if (combatMode)
             {
                 //transform.position = (combatTarget.transform.position) - transform.forward * dstFromTarget;
-                transform.position = combatTarget.transform.position;
-                transform.forward = playerController.transform.forward;
+                currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
+                transform.position = (target.transform.position) - transform.forward * dstFromTarget;
+                //transform.forward = playerController.transform.forward;
             }
             else
             {

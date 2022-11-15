@@ -51,10 +51,16 @@ public class EggPersonController : MonoBehaviour
 
     public HandMountPoint handMountPoint;
 
-    public float ragdollTimer = 3f;
+    public float ragdollTimer = 5f;
     public float ragdollCounter = 0f;
+
+
     public bool isRagdolled;
     public bool swinging = false;
+
+    public bool invuln = false;
+    public float invulnTimer = 3f;
+    public float invulnCounter = 0f;
 
     public float force;
     public Vector3 away;
@@ -62,6 +68,9 @@ public class EggPersonController : MonoBehaviour
     ShatteredEggPersonController sepc;
     void Start()
     {
+        invulnTimer = 3f;
+        ragdollTimer = 5f;
+
         controller = GetComponent<CharacterController>();
         eggAnimator = GetComponent<EggAnimator>();
 
@@ -98,6 +107,10 @@ public class EggPersonController : MonoBehaviour
         }
     }
 
+    public bool IsViolent()
+    {
+        return mountPoint.VIOLENT;
+    }
     public void OnHit(float forceSpeed, Vector3 splodePoint)
     {
         if (health == 2)
@@ -115,10 +128,11 @@ public class EggPersonController : MonoBehaviour
                     epc.rbody.AddForce(away);
                 }
             }
+            
         }
         else
         {
-            if (sepc == null)
+            if (sepc == null && !invuln)
             {
                 SwapToShattered(forceSpeed, splodePoint);
             }
@@ -134,7 +148,8 @@ public class EggPersonController : MonoBehaviour
             GameObject.Destroy(child.gameObject);
             // ...
         }
-        
+
+        wm.killedEnemies++;
         NpcController npc = GetComponent<NpcController>();
         controller.enabled = false;
         npc.enabled = false;

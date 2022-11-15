@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 public class NpcController : MonoBehaviour
 {
-    List<GameObject> travelMarkers;
+    List<PathMarker> travelMarkers;
     public EggPersonController eggPersonController;
 
     public Transform target;
@@ -26,15 +26,30 @@ public class NpcController : MonoBehaviour
     public bool targetingPlayer = false;
 
     PlayerController playerController;
+
+    public int pathFamily = -1;
+    public int currentPathOrder = 0;
+    public List<PathMarker> pathMarkers;
+
+    public float viewDistance = 30f;
+
+    int frames = 0;
     // Start is called before the first frame update
     void Start()
     {
-        travelMarkers = GameObject.FindGameObjectsWithTag("pathMarkers").ToList();
+        viewDistance = 100f;
+        travelMarkers = GameObject.FindObjectsOfType<PathMarker>().ToList();
         SetTargetToRandomTravelMarker();
         eggPersonController = GetComponent<EggPersonController>();
         nav = GetComponent<NavMeshAgent>();
         nav.speed = eggPersonController.walkSpeed;
         playerController = GameObject.FindObjectOfType<PlayerController>();
+
+        if(pathFamily >= 0)
+        {
+
+            pathMarkers = GameObject.FindObjectsOfType<PathMarker>().ToList().Where(el => el.family == pathFamily).ToList();
+        }
     }
 
     // Update is called once per frame
@@ -77,7 +92,30 @@ public class NpcController : MonoBehaviour
                     eggPersonController.StopRagdoll();
                 }
             }
-            else
+
+            //invuln controls
+            if (eggPersonController.invuln)
+            {
+                eggPersonController.invulnCounter += Time.deltaTime;
+                if (eggPersonController.invulnCounter > eggPersonController.invulnTimer)
+                {
+                    eggPersonController.invuln = false;
+                    eggPersonController.invulnCounter = 0f;
+
+                }
+            }
+
+            //look for player manager
+            frames++;
+            if(frames % 20 == 0 && !targetingPlayer && playerController.IsViolent())
+            {
+                frames = 0;
+                viewDistance = 20f * eggPersonController.wm.killedEnemies;
+                TryToObservePlayer();
+
+            }
+
+            if(!eggPersonController.isRagdolled)
             {
                 //movement management
                 if (isMoving)
@@ -87,11 +125,11 @@ public class NpcController : MonoBehaviour
                     {
                         if (targetingPlayer)
                         {
-                            //attack!
+                            AttackPlayer();
                         }
                         else
                         {
-                            SetTargetToRandomTravelMarker();
+                            SetTargetToNextPathMarker();
                         }
                     }
                     PathfindToTarget();
@@ -101,7 +139,6 @@ public class NpcController : MonoBehaviour
         else
         {
             //death handling 
-
             //eggPersonController.ToggleRagdoll(true);
             this.enabled = false;
         }
@@ -152,6 +189,33 @@ public class NpcController : MonoBehaviour
 
     }
 
+    void TryToObservePlayer()
+    {
+        //raycast to player based on "viewDistance"
+        Vector3 targetPos = playerController.transform.position;
+        targetPos.y += 2;
+        Vector3 startPoint = transform.position;
+        startPoint.y += 2;
+
+        Vector3 dir = targetPos - startPoint;
+        Ray ray = new Ray(startPoint, dir);
+
+        RaycastHit rayHit;
+        Debug.DrawRay(startPoint, dir, Color.red, 1f);
+
+        if (Physics.Raycast(ray, out rayHit, viewDistance))
+        {
+            if (rayHit.collider.gameObject.tag == "Player")
+            {
+                targetingPlayer = true;
+            }
+        }
+    }
+
+    void AttackPlayer()
+    {
+
+    }
     void PathfindToTarget()
     {
         nav.SetDestination(target.position);
@@ -168,6 +232,28 @@ public class NpcController : MonoBehaviour
         else
         {
             SetTargetToRandomTravelMarker();
+        }
+    }
+
+    void SetTargetToNextPathMarker()
+    {
+        if(pathFamily < 0)
+        {
+            SetTargetToRandomTravelMarker();
+        }
+        else
+        {
+            currentPathOrder++;
+            PathMarker pm = pathMarkers.Where(el => el.order ==currentPathOrder).FirstOrDefault();
+            if(pm != null)
+            {
+                target = pm.transform;
+            }
+            else
+            {
+                currentPathOrder = -1;
+                SetTargetToNextPathMarker();
+            }
         }
     }
 }
