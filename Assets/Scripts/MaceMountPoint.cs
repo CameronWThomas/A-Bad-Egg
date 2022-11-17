@@ -10,6 +10,8 @@ public class MaceMountPoint : MonoBehaviour
     public bool VIOLENT = false;
     public float violentTimer = 0f;
     public float violentTimerMax = 10f;
+
+    Vector3 force;
     // Start is called before the first frame update
     void Start()
     {

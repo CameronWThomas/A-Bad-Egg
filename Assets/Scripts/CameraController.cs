@@ -59,7 +59,7 @@ public class CameraController : MonoBehaviour
            
 
             //transform.position = player.transform.position + offset;
-
+            /*
             if (combatMode)
             {
                 //transform.position = (combatTarget.transform.position) - transform.forward * dstFromTarget;
@@ -69,6 +69,7 @@ public class CameraController : MonoBehaviour
             }
             else
             {
+            */
                 yaw += Input.GetAxis("Mouse X") * worldManager.mouseSensitivity;
                 pitch -= Input.GetAxis("Mouse Y") * worldManager.mouseSensitivity;
                 pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
@@ -78,7 +79,7 @@ public class CameraController : MonoBehaviour
 
                 transform.position = (target.transform.position) - transform.forward * dstFromTarget;
                 //transform.position = target.transform.position;
-            }
+            //}
 
 
             //camera distance

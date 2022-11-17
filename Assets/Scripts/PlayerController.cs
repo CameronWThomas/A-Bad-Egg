@@ -12,18 +12,13 @@ public class PlayerController : MonoBehaviour
 
     WorldManager worldManager;
 
-    //combat swing business
-    public float yaw;
-    public float pitch;
-    public Vector2 pitchMinMax = new Vector2(-40, 85);
-    public Vector2 yawMinMax = new Vector2(-40, 85);
-    public float rotationSmoothTime = .12f;
-    Vector3 rotationSmoothVelocity;
-    public Vector3 currentRotation;
+    CombatController combatController;
+
     // Start is called before the first frame update
     void Start()
     {
         eggPersonController = GetComponent<EggPersonController>();
+        combatController = GetComponent<CombatController>();
         cameraT = Camera.main.transform;
         mainCamera = Camera.main;
         camController = mainCamera.GetComponent<CameraController>();
@@ -63,13 +58,14 @@ public class PlayerController : MonoBehaviour
                 {
 
 
-                    if (eggPersonController.swinging)
+                    if(eggPersonController.swinging || combatController.swingReleased)
                     {
-                        //SwingMove(inputDir);
+
                     }
                     else
                     {
                         Move(inputDir, eggPersonController.running);
+
                     }
 
 
@@ -80,14 +76,15 @@ public class PlayerController : MonoBehaviour
                         eggPersonController.eggAnimator.SetArmed(eggPersonController.armed);
                         eggPersonController.myMace.SetVisible(eggPersonController.armed);
                     }
-                    if (eggPersonController.armed && Input.GetMouseButtonDown(0))
+                    
+                    if (eggPersonController.armed && Input.GetMouseButtonDown(0) && !combatController.swingReleased)
                     {
                         if (!eggPersonController.swinging)
                         {
-                            SetDefaultYawAndPitch();
+                            combatController.PrimeSwing();
                             eggPersonController.swinging = true;
                             eggPersonController.mountPoint.swinging = true;
-                            camController.SetCombatMode(eggPersonController.swinging);
+                            //camController.SetCombatMode(eggPersonController.swinging);
                             eggPersonController.eggAnimator.SetSwinging(true);
                         }
                     }
@@ -95,12 +92,7 @@ public class PlayerController : MonoBehaviour
                     {
                         if (eggPersonController.swinging)
                         {
-                            
-                            eggPersonController.swinging = false;
-                            eggPersonController.mountPoint.swinging = false;
-                            camController.SetCombatMode(eggPersonController.swinging);
-                            eggPersonController.eggAnimator.SetSwinging(false);
-                            
+                            combatController.ReleaseSwing();
                         }
                     }
 
@@ -130,76 +122,65 @@ public class PlayerController : MonoBehaviour
 
         if (eggPersonController.health > 0)
         {
-            if (eggPersonController.swinging)
+            
+            if ( eggPersonController.swinging || combatController.swingReleased)
             {
                 Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
                 Vector2 inputDir = input.normalized;
-                SwingMove(inputDir);
+                SwingMove(inputDir, eggPersonController.running);
+
+                //move yaw to targe yaw
+                //RotateToTarget();
             }
         }
 
     }
-    void SetDefaultYawAndPitch()
+
+
+
+    private void RotateToTarget(float inputRotation)
     {
-        yaw = transform.rotation.eulerAngles.y;
-        pitch = -2.5f;
+        if (combatController.swingReleased)
+        {
+            combatController.DecreaseYaw();
+        }
+        else
+        {
+            //yaw = initialYaw + eggPersonController.epc.transform.eulerAngles.y;
+            //targetYaw += initialYaw - 180 + eggPersonController.epc.transform.eulerAngles.y;
+        }
+
+        var yEuler  = (transform.eulerAngles.y > 180) ? transform.eulerAngles.y - 360 : transform.eulerAngles.y;
+
+        combatController.currentRotation = Vector3.SmoothDamp(combatController.currentRotation, new Vector3(combatController.pitch, yEuler + combatController.yaw), ref combatController.rotationSmoothVelocity, combatController.rotationSmoothTime);
+        eggPersonController.epc.transform.eulerAngles = combatController.currentRotation;
+
+        if (combatController.yaw <= combatController.targetYaw)
+        {
+            combatController.swingReleased = false;
+            combatController.StopSwinging();
+        }
     }
-    private void SwingMove(Vector2 inputDir)
+
+
+
+    private void SwingMove(Vector2 inputDir, bool running)
     {
-        /*
-        Vector3 targetForward = cameraT.forward;
-        targetForward.y = transform.forward.y;
-        transform.forward = targetForward;
-        */
         float targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + cameraT.eulerAngles.y;
         transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref eggPersonController.turnSmoothVelocity, eggPersonController.GetModifiedSmoothTime(eggPersonController.turnSmoothTime));
-        //yaw += targetRotation;
-
-        yaw += Input.GetAxis("Mouse X") * worldManager.mouseSensitivity;
-        //yaw = Mathf.Clamp(pitch, yawMinMax.x, yawMinMax.y);
-        pitch -= Input.GetAxis("Mouse Y") * worldManager.mouseSensitivity;
-        pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
-
-        //TODO: impose min max clamp on yaw.
-
-        currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
-
-        eggPersonController.epc.transform.eulerAngles = currentRotation;
         
-        //eggPersonController.epc.transform.localEulerAngles = currentRotation;
-        //this will move the whole cam... could work though
-        //transform.eulerAngles = currentRotation;
 
-        float targetSpeed = (eggPersonController.walkSpeed) * inputDir.magnitude;
-        eggPersonController.currentSpeed = Mathf.SmoothStep(eggPersonController.currentSpeed, targetSpeed, 1f);
-        eggPersonController.velocityY += Time.deltaTime * eggPersonController.wm.gravity;
-        Vector3 velocity = transform.forward * eggPersonController.currentSpeed + Vector3.up * eggPersonController.velocityY;
-
-        eggPersonController.controller.Move(velocity * Time.deltaTime);
-
-        
-        /*
-        if (inputDir != Vector2.zero)
-        {
-            float targetRotation = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg + cameraT.eulerAngles.y;
-            transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref eggPersonController.turnSmoothVelocity, eggPersonController.GetModifiedSmoothTime(eggPersonController.turnSmoothTime));
-        }
+        RotateToTarget(targetRotation);
 
         float targetSpeed = ((running) ? eggPersonController.runSpeed : eggPersonController.walkSpeed) * inputDir.magnitude;
-        //currentSpeed = Mathf.SmoothDamp(currentSpeed, targetSpeed, ref speedSmoothVelocity, GetModifiedSmoothTime(speedSmoothTime));
-        eggPersonController.currentSpeed = Mathf.SmoothStep(eggPersonController.currentSpeed, targetSpeed, 1f);
 
+        eggPersonController.currentSpeed = Mathf.SmoothStep(eggPersonController.currentSpeed, targetSpeed, 1f);
         eggPersonController.velocityY += Time.deltaTime * eggPersonController.wm.gravity;
         Vector3 velocity = transform.forward * eggPersonController.currentSpeed + Vector3.up * eggPersonController.velocityY;
 
         eggPersonController.controller.Move(velocity * Time.deltaTime);
-        eggPersonController.currentSpeed = new Vector2(eggPersonController.controller.velocity.x, eggPersonController.controller.velocity.z).magnitude;
 
-        if (eggPersonController.controller.isGrounded)
-        {
-            eggPersonController.velocityY = 0;
-        }
-        */
+        
     }
 
     private void FixedUpdate()
@@ -216,8 +197,7 @@ public class PlayerController : MonoBehaviour
 
     void Move(Vector2 inputDir, bool running)
     {
-        currentRotation = Vector3.SmoothDamp(currentRotation, Vector3.zero, ref rotationSmoothVelocity, rotationSmoothTime);
-        eggPersonController.epc.transform.eulerAngles = currentRotation;
+        
 
         if (inputDir != Vector2.zero)
         {

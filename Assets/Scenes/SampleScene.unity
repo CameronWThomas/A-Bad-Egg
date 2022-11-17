@@ -43473,12 +43473,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
   eggPersonController: {fileID: 0}
-  yaw: 0
-  pitch: 0
-  pitchMinMax: {x: -40, y: 85}
-  yawMinMax: {x: -40, y: 85}
-  rotationSmoothTime: 0.12
-  currentRotation: {x: 0, y: 0, z: 0}
 --- !u!23 &1782591518
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -44871,12 +44865,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 0}
   eggPersonController: {fileID: 0}
-  yaw: 0
-  pitch: 0
-  pitchMinMax: {x: -100, y: 25}
-  yawMinMax: {x: -40, y: 85}
-  rotationSmoothTime: 0.12
-  currentRotation: {x: 0, y: 0, z: 0}
 --- !u!114 &1829287272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44942,6 +44930,29 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 148116721bd28a94a888eed928ef9723, type: 3}
   m_PrefabInstance: {fileID: 1829287263}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1829287279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829287264}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb4b56f6f3440c6418f10e70e34b25ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  yaw: 0
+  targetYaw: 0
+  pitch: 0
+  targetPitch: 0
+  swingReleased: 0
+  pitchMinMax: {x: -40, y: 85}
+  yawMinMax: {x: -40, y: 85}
+  rotationSmoothTime: 0.12
+  rotationSmoothVelocity: {x: 0, y: 0, z: 0}
+  currentRotation: {x: 0, y: 0, z: 0}
+  yAtRelease: 0
 --- !u!4 &1829960326 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2519642988550574482, guid: ac93673518188f947aa9d2441cb19498, type: 3}
