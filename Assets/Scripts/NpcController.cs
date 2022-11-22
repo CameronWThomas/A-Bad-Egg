@@ -15,7 +15,7 @@ public class NpcController : MonoBehaviour
     public Vector3 targetDir;
     public Vector3 lookingAt;
 
-    float targetReachedPos = 5;
+    float targetReachedPos = 8f;
     bool running = false;
     NavMeshAgent nav;
 
@@ -33,7 +33,17 @@ public class NpcController : MonoBehaviour
 
     public float viewDistance = 30f;
 
+    CombatController combatController;
+
     int frames = 0;
+
+
+    float swingDistance = 15f;
+    float primeDistance = 50f;
+
+
+    float SwingPrimeTime = 4f;
+    float SwingPrimeCounter = 0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -45,7 +55,8 @@ public class NpcController : MonoBehaviour
         nav.speed = eggPersonController.walkSpeed;
         playerController = GameObject.FindObjectOfType<PlayerController>();
 
-        if(pathFamily >= 0)
+        combatController = GetComponent<CombatController>();
+        if (pathFamily >= 0)
         {
 
             pathMarkers = GameObject.FindObjectsOfType<PathMarker>().ToList().Where(el => el.family == pathFamily).ToList();
@@ -53,8 +64,13 @@ public class NpcController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void LateUpdate()
     {
+        if(eggPersonController.health == 1)
+        {
+            targetingPlayer = true;
+            target = GameObject.FindObjectOfType<PlayerController>().transform;
+        }
         //TODO: remove this "if" after my test
         if(target.name != playerController.name && targetingPlayer)
         {
@@ -67,10 +83,28 @@ public class NpcController : MonoBehaviour
             eggPersonController.controller.enabled = false;
             hasFixedCharController = true;
         }
-        
 
-        if (eggPersonController.health > 0)
+        //ragdoll controls
+        if (eggPersonController.ragdolled)
         {
+            //just float on
+            if (!nav.isStopped)
+            {
+                nav.isStopped = true;
+            }
+
+            eggPersonController.ragdollCounter += Time.deltaTime;
+            if (eggPersonController.ragdollCounter > eggPersonController.ragdollTimer)
+            {
+                eggPersonController.StopRagdoll();
+            }
+        } //healthy controls
+        else if (eggPersonController.health > 0)
+        {
+            if (nav.isStopped)
+            {
+                nav.isStopped = false;
+            }
 
             //speed management
             UpdateSpeed();
@@ -83,15 +117,6 @@ public class NpcController : MonoBehaviour
                 nav.speed = eggPersonController.walkSpeed;
             }
 
-            //ragdoll controls
-            if (eggPersonController.isRagdolled)
-            {
-                eggPersonController.ragdollCounter += Time.deltaTime;
-                if (eggPersonController.ragdollCounter > eggPersonController.ragdollTimer)
-                {
-                    eggPersonController.StopRagdoll();
-                }
-            }
 
             //invuln controls
             if (eggPersonController.invuln)
@@ -105,36 +130,15 @@ public class NpcController : MonoBehaviour
                 }
             }
 
-            //look for player manager
-            frames++;
-            if(frames % 20 == 0 && !targetingPlayer && playerController.IsViolent())
+            if (targetingPlayer)
             {
-                frames = 0;
-                viewDistance = 20f * eggPersonController.wm.killedEnemies;
-                TryToObservePlayer();
-
+                SeekAndDestroy();
             }
-
-            if(!eggPersonController.isRagdolled)
+            else
             {
-                //movement management
-                if (isMoving)
-                {
-                    float distance = (transform.position - target.position).magnitude;
-                    if (distance < targetReachedPos)
-                    {
-                        if (targetingPlayer)
-                        {
-                            AttackPlayer();
-                        }
-                        else
-                        {
-                            SetTargetToNextPathMarker();
-                        }
-                    }
-                    PathfindToTarget();
-                }
+                StandardNavigation();
             }
+            
         }
         else
         {
@@ -144,6 +148,102 @@ public class NpcController : MonoBehaviour
         }
 
 
+    }
+
+    void SeekAndDestroy()
+    {
+        //determine if we sould stop attacking
+        //look for player manager
+        frames++;
+        if (frames % 20 == 0)
+        {
+            frames = 0;
+            viewDistance = 20f * eggPersonController.wm.killedEnemies;
+            IsPlayerDownedOrDead();
+
+        }
+
+        if (isMoving)
+        {
+
+            float distance = (transform.position - target.position).magnitude;
+            if(distance < primeDistance)
+            {
+                SwingPrimeCounter++;
+                if (!eggPersonController.swinging)
+                {
+                    combatController.PrimeSwing();
+                    eggPersonController.swinging = true;
+                    eggPersonController.mountPoint.swinging = true;
+                    //camController.SetCombatMode(eggPersonController.swinging);
+                    eggPersonController.eggAnimator.SetSwinging(true);
+                }
+
+                if (distance < swingDistance)
+                {
+                    if (eggPersonController.swinging && SwingPrimeCounter > SwingPrimeTime)
+                    {
+                        combatController.ReleaseSwing();
+                        SwingPrimeCounter = 0;
+                    }
+                }
+
+            }
+        }
+        PathfindToTarget();
+    }
+
+    void StandardNavigation()
+    {
+        //look for player manager
+        frames++;
+        if (frames % 20 == 0 && !targetingPlayer && playerController.IsViolent())
+        {
+            frames = 0;
+            viewDistance = 20f * eggPersonController.wm.killedEnemies;
+            TryToObservePlayer();
+
+        }
+
+        //movement management
+        if (isMoving)
+        {
+            float distance = (transform.position - target.position).magnitude;
+            if (distance < targetReachedPos)
+            {
+                SetTargetToNextPathMarker();
+
+            }
+            PathfindToTarget();
+        }
+    }
+
+    void AttackPlayer()
+    {
+            
+
+        if (!combatController.swingReleased)
+        {
+            if (eggPersonController.swinging)
+            {
+                SwingPrimeCounter++;
+
+                if(SwingPrimeCounter > SwingPrimeTime)
+                {
+                    combatController.ReleaseSwing();
+
+                }
+            }
+            else
+            {
+
+                combatController.PrimeSwing();
+                eggPersonController.swinging = true;
+                eggPersonController.mountPoint.swinging = true;
+                //camController.SetCombatMode(eggPersonController.swinging);
+                eggPersonController.eggAnimator.SetSwinging(true);
+            }
+        }
     }
 
     
@@ -189,6 +289,19 @@ public class NpcController : MonoBehaviour
 
     }
 
+    void IsPlayerDownedOrDead()
+    {
+        EggPersonController player = target.GetComponent<EggPersonController>();
+        if(player == null)
+        {
+            SetTargetToNextPathMarker();
+        }
+        else if(player.health == 0 || player.rolling || player.ragdolled)
+        {
+            targetingPlayer = false;
+            SetTargetToRandomTravelMarker();
+        }
+    }
     void TryToObservePlayer()
     {
         //raycast to player based on "viewDistance"
@@ -212,14 +325,14 @@ public class NpcController : MonoBehaviour
         }
     }
 
-    void AttackPlayer()
-    {
 
-    }
     void PathfindToTarget()
     {
         nav.SetDestination(target.position);
+        combatController.RotateToTarget();
     }
+
+    
 
     void SetTargetToRandomTravelMarker()
     {

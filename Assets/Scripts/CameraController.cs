@@ -11,6 +11,7 @@ public class CameraController : MonoBehaviour
 
     //cust
     public bool lockCursor;
+    public bool softLocked;
 
     public Vector2 pitchMinMax = new Vector2(-40, 85);
 
@@ -54,7 +55,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        if (!locked)
+        if (!locked && !softLocked)
         {
            
 
@@ -85,6 +86,13 @@ public class CameraController : MonoBehaviour
             //camera distance
             dstFromTarget -= Input.mouseScrollDelta.y * scrollScale;
             dstFromTarget = Mathf.Clamp(dstFromTarget, dstMinMax.x, dstMinMax.y);
+        }else if (softLocked)
+        {
+            yaw += Input.GetAxis("Mouse X") * worldManager.mouseSensitivity;
+            pitch -= Input.GetAxis("Mouse Y") * worldManager.mouseSensitivity;
+            pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
+            currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
+            transform.eulerAngles = currentRotation;
         }
 
     }

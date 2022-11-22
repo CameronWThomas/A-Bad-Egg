@@ -57,7 +57,32 @@ public class CombatController : MonoBehaviour
         eggPersonController.eggAnimator.SetSwinging(false);
         currentRotation = new Vector3(0, 0, 0);
     }
+    public void RotateToTarget()
+    {
+        if (eggPersonController.swinging || swingReleased)
+        {
+            if (swingReleased)
+            {
+                DecreaseYaw();
+            }
+            else
+            {
+                //yaw = initialYaw + eggPersonController.epc.transform.eulerAngles.y;
+                //targetYaw += initialYaw - 180 + eggPersonController.epc.transform.eulerAngles.y;
+            }
 
+            var yEuler = (transform.eulerAngles.y > 180) ? transform.eulerAngles.y - 360 : transform.eulerAngles.y;
+
+            currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yEuler + yaw), ref rotationSmoothVelocity, rotationSmoothTime);
+            eggPersonController.epc.transform.eulerAngles = currentRotation;
+
+            if (yaw <= targetYaw)
+            {
+                swingReleased = false;
+                StopSwinging();
+            }
+        }
+    }
     public void DecreaseYaw()
     {
 

@@ -32,12 +32,12 @@ public class PlayerController : MonoBehaviour
         if (eggPersonController.health > 0)
         {
 
-            if (eggPersonController.isRagdolled)
+            if (eggPersonController.isRagdolled || eggPersonController.rolling)
             {
                 eggPersonController.ragdollCounter += Time.deltaTime;
                 if (eggPersonController.ragdollCounter > eggPersonController.ragdollTimer)
                 {
-                    eggPersonController.StopRagdoll();
+                    eggPersonController.StopRolling();
                 }
             }
             else
@@ -110,7 +110,13 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
-        
+        else
+        {
+            //death handling 
+            //eggPersonController.ToggleRagdoll(true);
+            this.enabled = false;
+        }
+
     }
 
     public bool IsViolent()
@@ -120,10 +126,11 @@ public class PlayerController : MonoBehaviour
     private void LateUpdate()
     {
 
-        if (eggPersonController.health > 0)
+        if (eggPersonController.health > 0 )
         {
             
-            if ( eggPersonController.swinging || combatController.swingReleased)
+            if (( eggPersonController.swinging || combatController.swingReleased) && 
+                !eggPersonController.rolling && !eggPersonController.ragdolled)
             {
                 Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
                 Vector2 inputDir = input.normalized;
@@ -132,6 +139,12 @@ public class PlayerController : MonoBehaviour
                 //move yaw to targe yaw
                 //RotateToTarget();
             }
+        }
+        else
+        {
+            //death handling 
+            //eggPersonController.ToggleRagdoll(true);
+            this.enabled = false;
         }
 
     }
@@ -170,7 +183,7 @@ public class PlayerController : MonoBehaviour
         transform.eulerAngles = Vector3.up * Mathf.SmoothDampAngle(transform.eulerAngles.y, targetRotation, ref eggPersonController.turnSmoothVelocity, eggPersonController.GetModifiedSmoothTime(eggPersonController.turnSmoothTime));
         
 
-        RotateToTarget(targetRotation);
+        combatController.RotateToTarget();
 
         float targetSpeed = ((running) ? eggPersonController.runSpeed : eggPersonController.walkSpeed) * inputDir.magnitude;
 

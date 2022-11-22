@@ -34,12 +34,30 @@ public class MaceMountPoint : MonoBehaviour
 
         if (swinging)
         {
-            EggPersonController controller = other.GetComponent<EggPersonController>();
-
-            if (controller != null && other.transform.root.name != transform.root.name)
+            //npc case
+            if (other.transform.parent != null)
             {
-                VIOLENT = true;
-                controller.OnHit(20, transform.position);
+                EggPersonController controller = other.GetComponentInParent<EggPersonController>();
+                if (controller == null)
+                {
+                    controller = other.GetComponent<EggPersonController>();
+                }
+
+                if (controller != null && other.transform.root.name != transform.root.name)
+                {
+                    VIOLENT = true;
+                    controller.OnHit(20, transform.position);
+                }
+            }
+            else //player case
+            {
+                EggPersonController controller = other.GetComponent<EggPersonController>();
+
+                if (controller != null && other.transform.root.name != transform.root.name)
+                {
+                    VIOLENT = true;
+                    controller.OnHit(20, transform.position);
+                }
             }
         }
     }

@@ -59,13 +59,15 @@ public class EggPersonController : MonoBehaviour
     public bool swinging = false;
 
     public bool invuln = false;
-    public float invulnTimer = 3f;
+    public float invulnTimer = 10f;
     public float invulnCounter = 0f;
 
     public float force;
     public Vector3 away;
     public Vector3 impactPoint;
     ShatteredEggPersonController sepc;
+    PlayerController playerController;
+    CombatController combatController;
     void Start()
     {
         invulnTimer = 3f;
@@ -92,7 +94,8 @@ public class EggPersonController : MonoBehaviour
         }
 
         immediateChildren = GetGameObjectsInDirectChildren(gameObject);
-
+        playerController = GetComponent<PlayerController>();
+        combatController = GetComponent<CombatController>();
     }
 
     // Update is called once per frame
@@ -119,7 +122,15 @@ public class EggPersonController : MonoBehaviour
             {
                 isRagdolled = true;
                 health--;
-                ToggleRagdoll(true);
+                combatController.StopSwinging();
+                if (playerController != null)
+                {
+                    StartRolling();
+                }
+                else
+                {
+                    ToggleRagdoll(true);
+                }
                 if (forceSpeed > 0)
                 {
                     impactPoint = splodePoint;
@@ -134,13 +145,24 @@ public class EggPersonController : MonoBehaviour
         {
             if (sepc == null && !invuln)
             {
+                if (playerController != null)
+                {
+                    CameraController camCon = Camera.main.GetComponent<CameraController>();
+                    if(camCon != null)
+                    {
+                        camCon.target = null;
+                        camCon.combatTarget = null;
+                        camCon.softLocked = true;
+                    }
+                }
                 SwapToShattered(forceSpeed, splodePoint);
             }
         }
     }
     public void SwapToShattered(float speed, Vector3 splodePoint)
     {
-        
+
+        health--;
         int count = transform.childCount;
         for (int i = 0; i < count; i++)
         {
@@ -152,7 +174,13 @@ public class EggPersonController : MonoBehaviour
         wm.killedEnemies++;
         NpcController npc = GetComponent<NpcController>();
         controller.enabled = false;
-        npc.enabled = false;
+        if (npc != null)
+        {
+            npc.enabled = false;
+        }
+        if (playerController != null) { 
+            playerController.enabled = false;
+        }
 
         ShatteredEggPersonController[] sepcs = GameObject.FindObjectsOfType<ShatteredEggPersonController>();
 
@@ -245,6 +273,7 @@ public class EggPersonController : MonoBehaviour
     public void StartRolling()
     {
         rolling = true;
+        isRagdolled = true;
         ToggleRagdoll(true);
         SeperateChildren();
         //rb.useGravity = true;
@@ -257,6 +286,7 @@ public class EggPersonController : MonoBehaviour
         SetPosToCore();
         ConsumeChildren();
         rolling = false;
+        isRagdolled = false;
         ToggleRagdoll(false);
         //rb.useGravity = false;
         //rb.isKinematic = true;
