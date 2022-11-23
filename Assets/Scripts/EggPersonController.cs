@@ -82,7 +82,7 @@ public class EggPersonController : MonoBehaviour
     void Start()
     {
         invulnTimer = 3f;
-        ragdollTimer = 5f;
+        ragdollTimer = 10f;
         swingCooldownTimer = 0.8f;
         controller = GetComponent<CharacterController>();
         eggAnimator = GetComponent<EggAnimator>();
@@ -110,6 +110,10 @@ public class EggPersonController : MonoBehaviour
         navMeshAgent= GetComponent<NavMeshAgent>();
     }
 
+    public bool IsRagdolling()
+    {
+        return isRagdolled || rolling || ragdolled;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -156,7 +160,7 @@ public class EggPersonController : MonoBehaviour
         {
 
         }
-        else if (health == 2 && !instaDeath)
+        else if (health  > 1 && !instaDeath)
         {
             invuln = true;
             if (!isRagdolled)

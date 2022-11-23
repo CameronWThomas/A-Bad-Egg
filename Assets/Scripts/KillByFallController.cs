@@ -26,32 +26,39 @@ public class KillByFallController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         heightCounter += Time.deltaTime;
         if(heightCounter > heightTimer)
         {
             heightCounter = 0f;
             initHeight = me.epc.transform.position.y;
         }
+
         currHeight = me.epc.transform.position.y;
-        if(currHeight > initHeight)
+        if(currHeight - initHeight >= 1)
         {
             initHeight = currHeight;
             heightCounter = 0f;
         }
-        if (initHeight - currHeight >= fallHeight)
+
+        if (initHeight - currHeight >= fallHeight && !me.fallingToDeath)
         {
             me.fallingToDeath = true;
-            if (me.playerController != null)
+            if (!me.IsRagdolling())
             {
-                me.ToggleRoll();
-            }
-            else
-            {
-                me.ToggleRagdoll(true);
+                if (me.playerController != null)
+                {
+                    //me.ToggleRagdoll(true);
+                    me.ToggleRoll();
+                }
+                else
+                {
+                    me.ToggleRagdoll(true);
+                }
             }
         }
 
-        if (me.controller.enabled)
+        if (me.controller.enabled && !me.isRagdolled && !me.rolling && !me.ragdolled)
         {
             if (me.controller.isGrounded)
             {
@@ -63,17 +70,22 @@ public class KillByFallController : MonoBehaviour
         if (me.fallingToDeath && me.health != 0)
         {
             timer += Time.deltaTime;
-            if(timer > counter)
+            if(timer > counter && me.fallingToDeath)
             {
                 me.fallingToDeath = false;
                 timer = 0f;
-                if (me.playerController != null)
+                initHeight = me.epc.transform.position.y;
+                if (me.IsRagdolling())
                 {
-                    me.ToggleRoll();
-                }
-                else
-                {
-                    me.ToggleRagdoll(false);
+                    if (me.playerController != null)
+                    {
+                        //me.ToggleRagdoll(false);
+                        me.ToggleRoll();
+                    }
+                    else
+                    {
+                        me.ToggleRagdoll(false);
+                    }
                 }
 
             }
@@ -82,7 +94,9 @@ public class KillByFallController : MonoBehaviour
 
             if (pos.y - terrainHeight <= Mathf.Abs(1.2f))
             {
-                me.OnHit(0f, me.epc.transform.position, true);
+                Vector3 forcePos = me.epc.transform.position;
+                forcePos.y += 1;
+                me.OnHit(20f, forcePos, true);
             }
         }
     }
