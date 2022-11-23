@@ -41,7 +41,7 @@ public class NpcController : MonoBehaviour
     float swingDistance = 10f;
     float primeDistance = 50f;
 
-
+    int startingHealth = -1;
     float SwingPrimeTime = 4f;
     float SwingPrimeCounter = 0f;
     // Start is called before the first frame update
@@ -66,13 +66,15 @@ public class NpcController : MonoBehaviour
 
             pathMarkers = GameObject.FindObjectsOfType<PathMarker>().ToList().Where(el => el.family == pathFamily).ToList();
         }
+
+        startingHealth = eggPersonController.health;
     }
     // Update is called once per frame
     void LateUpdate()
     {
         if (!eggPersonController.fallingToDeath)
         {
-            if (eggPersonController.health == 1)
+            if (eggPersonController.health < startingHealth)
             {
                 targetingPlayer = true;
                 target = GameObject.FindObjectOfType<PlayerController>().transform;
@@ -128,6 +130,7 @@ public class NpcController : MonoBehaviour
 
 
                 //invuln controls
+                /*
                 if (eggPersonController.invuln)
                 {
                     eggPersonController.invulnCounter += Time.deltaTime;
@@ -138,7 +141,7 @@ public class NpcController : MonoBehaviour
 
                     }
                 }
-
+                */
                 if (targetingPlayer)
                 {
                     SeekAndDestroy();

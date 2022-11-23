@@ -66,7 +66,7 @@ public class EggPersonController : MonoBehaviour
     public Vector3 away;
     public Vector3 impactPoint;
     ShatteredEggPersonController sepc;
-    PlayerController playerController;
+    public PlayerController playerController;
     CombatController combatController;
 
     float swingCooldownCounter = 0f;
@@ -83,7 +83,7 @@ public class EggPersonController : MonoBehaviour
     {
         invulnTimer = 3f;
         ragdollTimer = 5f;
-
+        swingCooldownTimer = 0.8f;
         controller = GetComponent<CharacterController>();
         eggAnimator = GetComponent<EggAnimator>();
 
@@ -133,6 +133,15 @@ public class EggPersonController : MonoBehaviour
         {
             isJumping = false;
         }
+        if (invuln)
+        {
+            invulnCounter += Time.deltaTime;
+            if(invulnCounter > invulnTimer)
+            {
+                invulnCounter = 0;
+                invuln = false;
+            }
+        }
 
         //FallHandler();
     }
@@ -143,8 +152,13 @@ public class EggPersonController : MonoBehaviour
     }
     public void OnHit(float forceSpeed, Vector3 splodePoint, bool instaDeath = false)
     {
-        if (health == 2 && !instaDeath)
+        if (invuln)
         {
+
+        }
+        else if (health == 2 && !instaDeath)
+        {
+            invuln = true;
             if (!isRagdolled)
             {
                 isRagdolled = true;
@@ -170,7 +184,7 @@ public class EggPersonController : MonoBehaviour
         }
         else
         {
-            if (sepc == null && !invuln)
+            if (sepc == null)
             {
                 if (playerController != null)
                 {
@@ -458,58 +472,6 @@ public class EggPersonController : MonoBehaviour
         }
     }
 
-    void FallHandler()
-    {
-
-        if (fallingToDeath)
-        {
-           
-        }
-        else
-        {
-            if (controller.enabled && !rolling && !ragdolled)
-            {
-                if (controller.velocity.y < FALLING_THRESHOLD)
-                { 
-                    fallingToDeath = true;
-                    ToggleRoll();
-                }
-            }
-            else
-            {
-                if (ragdolled || rolling)
-                {
-                    if (epc.rbody.velocity.y < RAGDOLL_FALLING_THRESHOLD)
-                    {
-                        fallingToDeath=true;
-                    }
-                }
-                else if(navMeshAgent != null)
-                {
-                    if (navMeshAgent.velocity.y < FALLING_THRESHOLD)
-                    {
-                        ToggleRagdoll(true);
-                        fallingToDeath = true;
-                    }
-                }
-                /*
-                if(navMeshAgent != null)
-                {
-                    if(navMeshAgent.velocity.y < FALLING_THRESHOLD)
-                    {
-                        ToggleRagdoll(true);
-                        fallingToDeath = true;
-                    }
-                }
-                else if (epc.rbody.velocity.y < RAGDOLL_FALLING_THRESHOLD)
-                {
-                    //OnHit(40, new Vector3(epc.transform.position.x, epc.transform.position.y - 1f, epc.transform.position.z));
-
-                    fallingToDeath = true;
-                }
-                */
-            }
-            
-        }
-    }
+    
+    
 }

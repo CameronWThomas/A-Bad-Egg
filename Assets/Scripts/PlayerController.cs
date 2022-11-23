@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     WorldManager worldManager;
 
+
     CombatController combatController;
 
     bool initialStatusFix = false;
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
     {
         //Debug.Log(eggPersonController.epc.rbody.velocity);
         //Debug.Log(eggPersonController.controller.velocity);
+
         if (!initialStatusFix)
         {
             initialStatusFix = true;
@@ -56,63 +58,54 @@ public class PlayerController : MonoBehaviour
                 Vector2 inputDir = input.normalized;
                 eggPersonController.running = Input.GetKey(KeyCode.LeftShift);
 
-                if (eggPersonController.rolling)
+                
+                
+
+
+                if(eggPersonController.swinging || combatController.swingReleased)
                 {
-                    //RollAround(inputDir, running);
-                    //transform.position = epc.transform.position;
-                    //transform.position = coreOffset + epc.transform.position;
+
                 }
                 else
                 {
+                    Move(inputDir, eggPersonController.running);
 
-
-                    if(eggPersonController.swinging || combatController.swingReleased)
-                    {
-
-                    }
-                    else
-                    {
-                        Move(inputDir, eggPersonController.running);
-
-                    }
-
-
-                    //armed / unarmed
-                    if (Input.GetKeyUp(KeyCode.F))
-                    {
-                        eggPersonController.armed = !eggPersonController.armed;
-                        eggPersonController.eggAnimator.SetArmed(eggPersonController.armed);
-                        eggPersonController.myMace.SetVisible(eggPersonController.armed);
-                    }
-                    
-                    if (eggPersonController.armed && Input.GetMouseButtonDown(0) && !combatController.swingReleased && !eggPersonController.swingCooldown)
-                    {
-                        if (!eggPersonController.swinging)
-                        {
-                            combatController.PrimeSwing();
-                            eggPersonController.swinging = true;
-                            eggPersonController.mountPoint.swinging = true;
-                            //camController.SetCombatMode(eggPersonController.swinging);
-                            eggPersonController.eggAnimator.SetSwinging(true);
-                        }
-                    }
-                    if (eggPersonController.armed && Input.GetMouseButtonUp(0) && eggPersonController.swinging)
-                    {
-                        combatController.ReleaseSwing();
-                    }
-
-                    //jump
-                    if (Input.GetKeyDown(KeyCode.Space))
-                    {
-                        eggPersonController.Jump();
-                        eggPersonController.eggAnimator.OnJumping();
-                    }
                 }
 
-                if (Input.GetKeyUp(KeyCode.R))
+
+                //armed / unarmed
+                if (Input.GetKeyUp(KeyCode.F))
                 {
-                    eggPersonController.ToggleRoll();
+                    eggPersonController.armed = !eggPersonController.armed;
+                    eggPersonController.eggAnimator.SetArmed(eggPersonController.armed);
+                    eggPersonController.myMace.SetVisible(eggPersonController.armed);
                 }
+                    
+                if (eggPersonController.armed && Input.GetMouseButtonDown(0) && !combatController.swingReleased && !eggPersonController.swingCooldown)
+                {
+                    if (!eggPersonController.swinging)
+                    {
+                        combatController.PrimeSwing();
+                        eggPersonController.swinging = true;
+                        eggPersonController.mountPoint.swinging = true;
+                        //camController.SetCombatMode(eggPersonController.swinging);
+                        eggPersonController.eggAnimator.SetSwinging(true);
+                    }
+                }
+                if (eggPersonController.armed && Input.GetMouseButtonUp(0) && eggPersonController.swinging)
+                {
+                    combatController.ReleaseSwing();
+                }
+
+                //jump
+                if (Input.GetKeyDown(KeyCode.Space))
+                {
+                    eggPersonController.Jump();
+                    eggPersonController.eggAnimator.OnJumping();
+                }
+                
+
+                
             }
         }
         else

@@ -7,6 +7,7 @@ public class MaceMountPoint : MonoBehaviour
     HandMountPoint handMountPoint;
     Quaternion armedRotation = new Quaternion(-0.456308216f, 0.169321358f, -0.135407642f, 0.863005161f);
     public bool swinging = false;
+    public bool swingReleased = false;
     public bool VIOLENT = false;
     public float violentTimer = 0f;
     public float violentTimerMax = 10f;
@@ -46,10 +47,15 @@ public class MaceMountPoint : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
 
-        if (swinging && !cooldown)
+        if (swingReleased && !cooldown)
         {
+            MaceMountPoint mmp = other.GetComponent<MaceMountPoint>();
+            if (mmp != null)
+            {
+
+            }
             //npc case
-            if (other.transform.parent != null)
+            else if (other.transform.parent != null)
             {
                 EggPersonController controller = other.GetComponentInParent<EggPersonController>();
                 if (controller == null)

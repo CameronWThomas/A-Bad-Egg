@@ -16,9 +16,18 @@ public class WorldManager : MonoBehaviour
         NumEnemies = GameObject.FindObjectsOfType<NpcController>().Length;
     }
 
+    private void OnGUI()
+    {
+
+        GUI.Label(new Rect(0, 0, 100, 50), "GOAL: " + killedEnemies + " / " + NumEnemies);
+        GUI.Label(new Rect(Screen.width - 100, 0, 100, 50), "\"R\" to restart level.");
+    }
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyUp(KeyCode.R))
+        {
+            Application.LoadLevel(Application.loadedLevel);
+        }
     }
 }

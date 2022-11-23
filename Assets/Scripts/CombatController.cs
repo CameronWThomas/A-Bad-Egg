@@ -41,6 +41,7 @@ public class CombatController : MonoBehaviour
         targetYaw = yaw - 180;
         targetPitch = pitch;
         swingReleased = true;
+        eggPersonController.mountPoint.swingReleased = true;
         yAtRelease = eggPersonController.epc.transform.eulerAngles.y;
     }
 
@@ -72,13 +73,16 @@ public class CombatController : MonoBehaviour
             }
 
             var yEuler = (transform.eulerAngles.y > 180) ? transform.eulerAngles.y - 360 : transform.eulerAngles.y;
+            //var yEuler = transform.eulerAngles.y;
 
             currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yEuler + yaw), ref rotationSmoothVelocity, rotationSmoothTime);
             eggPersonController.epc.transform.eulerAngles = currentRotation;
+            //eggPersonController.epc.transform.rotation = new Quaternion(currentRotation.x, currentRotation.y, currentRotation.z, eggPersonController.epc.transform.rotation.w);
 
             if (yaw <= targetYaw)
             {
                 swingReleased = false;
+                eggPersonController.mountPoint.swingReleased = false;
                 StopSwinging();
             }
         }

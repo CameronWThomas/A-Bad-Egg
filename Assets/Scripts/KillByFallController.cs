@@ -41,7 +41,14 @@ public class KillByFallController : MonoBehaviour
         if (initHeight - currHeight >= fallHeight)
         {
             me.fallingToDeath = true;
-            me.ToggleRagdoll(true);
+            if (me.playerController != null)
+            {
+                me.ToggleRoll();
+            }
+            else
+            {
+                me.ToggleRagdoll(true);
+            }
         }
 
         if (me.controller.enabled)
@@ -60,11 +67,20 @@ public class KillByFallController : MonoBehaviour
             {
                 me.fallingToDeath = false;
                 timer = 0f;
+                if (me.playerController != null)
+                {
+                    me.ToggleRoll();
+                }
+                else
+                {
+                    me.ToggleRagdoll(false);
+                }
+
             }
             Vector3 pos = transform.position;
             float terrainHeight = Terrain.activeTerrain.SampleHeight(transform.position);
-            
-            if(pos.y - terrainHeight <= Mathf.Abs(1.2f))
+
+            if (pos.y - terrainHeight <= Mathf.Abs(1.2f))
             {
                 me.OnHit(0f, me.epc.transform.position, true);
             }
