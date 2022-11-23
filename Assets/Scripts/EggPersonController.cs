@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
+using UnityEngine.AI;
 
 public class EggPersonController : MonoBehaviour
 {
@@ -68,6 +68,17 @@ public class EggPersonController : MonoBehaviour
     ShatteredEggPersonController sepc;
     PlayerController playerController;
     CombatController combatController;
+
+    float swingCooldownCounter = 0f;
+    public float swingCooldownTimer = 0.8f;
+    public bool swingCooldown = false;
+
+    NavMeshAgent navMeshAgent;
+
+    float FALLING_THRESHOLD = -20f;
+    float RAGDOLL_FALLING_THRESHOLD = -2f;
+    public bool fallingToDeath = false;
+    bool isJumping;
     void Start()
     {
         invulnTimer = 3f;
@@ -96,6 +107,7 @@ public class EggPersonController : MonoBehaviour
         immediateChildren = GetGameObjectsInDirectChildren(gameObject);
         playerController = GetComponent<PlayerController>();
         combatController = GetComponent<CombatController>();
+        navMeshAgent= GetComponent<NavMeshAgent>();
     }
 
     // Update is called once per frame
@@ -108,15 +120,30 @@ public class EggPersonController : MonoBehaviour
             away = (epc.transform.position - impactPoint).normalized;
             epc.rbody.AddForce(away);
         }
+        if (swingCooldown)
+        {
+            swingCooldownCounter += Time.deltaTime;
+            if(swingCooldownCounter > swingCooldownTimer)
+            {
+                swingCooldown = false;
+                swingCooldownCounter = 0;
+            }
+        }
+        if(controller != null && controller.isGrounded)
+        {
+            isJumping = false;
+        }
+
+        //FallHandler();
     }
 
     public bool IsViolent()
     {
         return mountPoint.VIOLENT;
     }
-    public void OnHit(float forceSpeed, Vector3 splodePoint)
+    public void OnHit(float forceSpeed, Vector3 splodePoint, bool instaDeath = false)
     {
-        if (health == 2)
+        if (health == 2 && !instaDeath)
         {
             if (!isRagdolled)
             {
@@ -157,11 +184,19 @@ public class EggPersonController : MonoBehaviour
                 }
                 SwapToShattered(forceSpeed, splodePoint);
             }
+
+            if (instaDeath)
+            {
+                health = 0;
+            }
         }
     }
     public void SwapToShattered(float speed, Vector3 splodePoint)
     {
-
+        if (rolling)
+        {
+            ConsumeChildren();
+        }
         health--;
         int count = transform.childCount;
         for (int i = 0; i < count; i++)
@@ -194,8 +229,8 @@ public class EggPersonController : MonoBehaviour
         }
         if (sepc != null)
         {
-            sepc.transform.position = this.transform.position;
-            sepc.transform.rotation = this.transform.rotation;
+            sepc.transform.position = epc.transform.position;
+            sepc.transform.rotation = epc.transform.rotation;
 
             sepc.ImpactPoint = splodePoint;
             sepc.ImpactSpeed = speed;
@@ -215,17 +250,22 @@ public class EggPersonController : MonoBehaviour
         float effectiveHeight = (jumpHeight / (wm.gravity / -2));
         if (controller.isGrounded)
         {
+            isJumping = true;
             float jumpVelocity = Mathf.Sqrt(-2 * wm.gravity * effectiveHeight);
             velocityY = jumpVelocity;
         }
     }
     public void ToggleRagdoll(bool start)
     {
+        NpcController npc = GetComponent<NpcController>();
         if (!start)
         {
             ragdolled = false;
             eggAnimator.animator.enabled = true;
-            controller.enabled = true;
+            if (npc != null)
+            {
+                controller.enabled = true;
+            }
             //rootRbody.isKinematic = true;
             //rootRbody.useGravity = false;
             foreach (Rigidbody ragdollBone in ragdollBones)
@@ -240,7 +280,10 @@ public class EggPersonController : MonoBehaviour
         {
             ragdolled = true;
             eggAnimator.animator.enabled = false;
-            controller.enabled = false;
+            if (npc != null)
+            {
+                controller.enabled = false;
+            }
             //rootRbody.isKinematic = false;
             //rootRbody.useGravity = true;
             foreach (Rigidbody ragdollBone in ragdollBones)
@@ -284,6 +327,20 @@ public class EggPersonController : MonoBehaviour
     public void StopRolling()
     {
         SetPosToCore();
+        ConsumeChildren();
+        rolling = false;
+        isRagdolled = false;
+        ToggleRagdoll(false);
+        //rb.useGravity = false;
+        //rb.isKinematic = true;
+        //controller.enabled = !rolling;
+        //eggAnimator.animator.enabled = !rolling;
+
+    }
+
+    public void StopRollingNPC()
+    {
+        SetPosToCoreNPC();
         ConsumeChildren();
         rolling = false;
         isRagdolled = false;
@@ -365,7 +422,20 @@ public class EggPersonController : MonoBehaviour
     {
 
         Vector3 newPos = epc.transform.position;
-        transform.position = new Vector3(newPos.x, newPos.y + 5, newPos.z);
+        transform.position = new Vector3(newPos.x, newPos.y + 0.1f, newPos.z) ;
+    }
+    void SetPosToCoreNPC()
+    {
+
+        Vector3 newPos = epc.transform.position;
+        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        float oldRadius = agent.radius;
+        //agent.radius = 2f;
+        agent.Warp(new Vector3(newPos.x, newPos.y, newPos.z));
+        //agent.radius = oldRadius;
+        //agent.nextPosition = newPos;
+        //agent.enabled = false;
+        //agent.enabled = true;
     }
     void SeperateChildren()
     {
@@ -385,6 +455,61 @@ public class EggPersonController : MonoBehaviour
             DistanceKeeper distanceKeeper = child.GetComponent<DistanceKeeper>();
             if (distanceKeeper != null) distanceKeeper.active = true;
 
+        }
+    }
+
+    void FallHandler()
+    {
+
+        if (fallingToDeath)
+        {
+           
+        }
+        else
+        {
+            if (controller.enabled && !rolling && !ragdolled)
+            {
+                if (controller.velocity.y < FALLING_THRESHOLD)
+                { 
+                    fallingToDeath = true;
+                    ToggleRoll();
+                }
+            }
+            else
+            {
+                if (ragdolled || rolling)
+                {
+                    if (epc.rbody.velocity.y < RAGDOLL_FALLING_THRESHOLD)
+                    {
+                        fallingToDeath=true;
+                    }
+                }
+                else if(navMeshAgent != null)
+                {
+                    if (navMeshAgent.velocity.y < FALLING_THRESHOLD)
+                    {
+                        ToggleRagdoll(true);
+                        fallingToDeath = true;
+                    }
+                }
+                /*
+                if(navMeshAgent != null)
+                {
+                    if(navMeshAgent.velocity.y < FALLING_THRESHOLD)
+                    {
+                        ToggleRagdoll(true);
+                        fallingToDeath = true;
+                    }
+                }
+                else if (epc.rbody.velocity.y < RAGDOLL_FALLING_THRESHOLD)
+                {
+                    //OnHit(40, new Vector3(epc.transform.position.x, epc.transform.position.y - 1f, epc.transform.position.z));
+
+                    fallingToDeath = true;
+                }
+                */
+            }
+            
         }
     }
 }

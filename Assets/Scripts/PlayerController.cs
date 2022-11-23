@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
 
     CombatController combatController;
 
+    bool initialStatusFix = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +30,14 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (eggPersonController.health > 0)
+        //Debug.Log(eggPersonController.epc.rbody.velocity);
+        //Debug.Log(eggPersonController.controller.velocity);
+        if (!initialStatusFix)
+        {
+            initialStatusFix = true;
+            eggPersonController.invulnTimer = eggPersonController.ragdollTimer;
+        }
+        if (eggPersonController.health > 0 && !eggPersonController.fallingToDeath)
         {
 
             if (eggPersonController.isRagdolled || eggPersonController.rolling)
@@ -77,7 +85,7 @@ public class PlayerController : MonoBehaviour
                         eggPersonController.myMace.SetVisible(eggPersonController.armed);
                     }
                     
-                    if (eggPersonController.armed && Input.GetMouseButtonDown(0) && !combatController.swingReleased)
+                    if (eggPersonController.armed && Input.GetMouseButtonDown(0) && !combatController.swingReleased && !eggPersonController.swingCooldown)
                     {
                         if (!eggPersonController.swinging)
                         {
@@ -88,12 +96,9 @@ public class PlayerController : MonoBehaviour
                             eggPersonController.eggAnimator.SetSwinging(true);
                         }
                     }
-                    if (eggPersonController.armed && Input.GetMouseButtonUp(0))
+                    if (eggPersonController.armed && Input.GetMouseButtonUp(0) && eggPersonController.swinging)
                     {
-                        if (eggPersonController.swinging)
-                        {
-                            combatController.ReleaseSwing();
-                        }
+                        combatController.ReleaseSwing();
                     }
 
                     //jump

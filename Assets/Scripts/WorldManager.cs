@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WorldManager : MonoBehaviour
 {
-    public float gravity = -12;
+    public float gravity = -15;
     public float mouseSensitivity = 10;
     public bool development = false;
     public int NumEnemies;

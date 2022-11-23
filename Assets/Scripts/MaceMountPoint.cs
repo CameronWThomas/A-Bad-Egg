@@ -11,6 +11,10 @@ public class MaceMountPoint : MonoBehaviour
     public float violentTimer = 0f;
     public float violentTimerMax = 10f;
 
+    float hitCooldownCounter = 0f;
+    float hitCooldownTimer = 0.2f;
+    bool cooldown = false;
+
     Vector3 force;
     // Start is called before the first frame update
     void Start()
@@ -27,12 +31,22 @@ public class MaceMountPoint : MonoBehaviour
             VIOLENT = false;
             violentTimer = 0f;
         }
+
+        if (cooldown)
+        {
+            hitCooldownCounter += Time.deltaTime;
+            if(hitCooldownCounter > hitCooldownTimer)
+            {
+                cooldown = false;
+                hitCooldownCounter = 0f;
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
 
-        if (swinging)
+        if (swinging && !cooldown)
         {
             //npc case
             if (other.transform.parent != null)
@@ -47,6 +61,7 @@ public class MaceMountPoint : MonoBehaviour
                 {
                     VIOLENT = true;
                     controller.OnHit(20, transform.position);
+                    cooldown = true;
                 }
             }
             else //player case
@@ -57,6 +72,7 @@ public class MaceMountPoint : MonoBehaviour
                 {
                     VIOLENT = true;
                     controller.OnHit(20, transform.position);
+                    cooldown = true;
                 }
             }
         }

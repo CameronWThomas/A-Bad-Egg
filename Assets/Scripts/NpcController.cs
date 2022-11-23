@@ -38,7 +38,7 @@ public class NpcController : MonoBehaviour
     int frames = 0;
 
 
-    float swingDistance = 15f;
+    float swingDistance = 10f;
     float primeDistance = 50f;
 
 
@@ -51,6 +51,11 @@ public class NpcController : MonoBehaviour
         travelMarkers = GameObject.FindObjectsOfType<PathMarker>().ToList();
         SetTargetToRandomTravelMarker();
         eggPersonController = GetComponent<EggPersonController>();
+        //move a bit slower.
+        eggPersonController.runSpeed = 8f;
+        eggPersonController.walkSpeed = 4f;
+        eggPersonController.swingCooldownTimer *= 3;
+
         nav = GetComponent<NavMeshAgent>();
         nav.speed = eggPersonController.walkSpeed;
         playerController = GameObject.FindObjectOfType<PlayerController>();
@@ -62,89 +67,94 @@ public class NpcController : MonoBehaviour
             pathMarkers = GameObject.FindObjectsOfType<PathMarker>().ToList().Where(el => el.family == pathFamily).ToList();
         }
     }
-
     // Update is called once per frame
     void LateUpdate()
     {
-        if(eggPersonController.health == 1)
+        if (!eggPersonController.fallingToDeath)
         {
-            targetingPlayer = true;
-            target = GameObject.FindObjectOfType<PlayerController>().transform;
-        }
-        //TODO: remove this "if" after my test
-        if(target.name != playerController.name && targetingPlayer)
-        {
-            TargetPlayer();
-        }
-
-        if (!hasFixedCharController)
-        {
-
-            eggPersonController.controller.enabled = false;
-            hasFixedCharController = true;
-        }
-
-        //ragdoll controls
-        if (eggPersonController.ragdolled)
-        {
-            //just float on
-            if (!nav.isStopped)
+            if (eggPersonController.health == 1)
             {
-                nav.isStopped = true;
+                targetingPlayer = true;
+                target = GameObject.FindObjectOfType<PlayerController>().transform;
+            }
+            //TODO: remove this "if" after my test
+            if (target.name != playerController.name && targetingPlayer)
+            {
+                TargetPlayer();
             }
 
-            eggPersonController.ragdollCounter += Time.deltaTime;
-            if (eggPersonController.ragdollCounter > eggPersonController.ragdollTimer)
+            if (!hasFixedCharController)
             {
-                eggPersonController.StopRagdoll();
-            }
-        } //healthy controls
-        else if (eggPersonController.health > 0)
-        {
-            if (nav.isStopped)
-            {
-                nav.isStopped = false;
+
+                eggPersonController.controller.enabled = false;
+                hasFixedCharController = true;
             }
 
-            //speed management
-            UpdateSpeed();
-            if (isRunning && nav.speed != eggPersonController.runSpeed)
+            //ragdoll controls
+            if (eggPersonController.ragdolled)
             {
-                nav.speed = eggPersonController.runSpeed;
-            }
-            else if (!isRunning && nav.speed != eggPersonController.walkSpeed)
-            {
-                nav.speed = eggPersonController.walkSpeed;
-            }
-
-
-            //invuln controls
-            if (eggPersonController.invuln)
-            {
-                eggPersonController.invulnCounter += Time.deltaTime;
-                if (eggPersonController.invulnCounter > eggPersonController.invulnTimer)
+                //just float on
+                if (!nav.isStopped)
                 {
-                    eggPersonController.invuln = false;
-                    eggPersonController.invulnCounter = 0f;
+                    nav.isStopped = true;
+                }
+
+                eggPersonController.ragdollCounter += Time.deltaTime;
+                if (eggPersonController.ragdollCounter > eggPersonController.ragdollTimer)
+                {
+                    eggPersonController.StopRollingNPC();
+                }
+            } //healthy controls
+            else if (eggPersonController.health > 0)
+            {
+                if (eggPersonController.health == 1)
+                {
 
                 }
-            }
+                if (nav.isStopped)
+                {
+                    nav.isStopped = false;
+                }
+                //speed management
+                UpdateSpeed();
+                if (isRunning && nav.speed != eggPersonController.runSpeed)
+                {
+                    nav.speed = eggPersonController.runSpeed;
+                }
+                else if (!isRunning && nav.speed != eggPersonController.walkSpeed)
+                {
+                    nav.speed = eggPersonController.walkSpeed;
+                }
 
-            if (targetingPlayer)
-            {
-                SeekAndDestroy();
+
+                //invuln controls
+                if (eggPersonController.invuln)
+                {
+                    eggPersonController.invulnCounter += Time.deltaTime;
+                    if (eggPersonController.invulnCounter > eggPersonController.invulnTimer)
+                    {
+                        eggPersonController.invuln = false;
+                        eggPersonController.invulnCounter = 0f;
+
+                    }
+                }
+
+                if (targetingPlayer)
+                {
+                    SeekAndDestroy();
+                }
+                else
+                {
+                    StandardNavigation();
+                }
+
             }
             else
             {
-                StandardNavigation();
+                //death handling 
+                //eggPersonController.ToggleRagdoll(true);
+                this.enabled = false;
             }
-            
-        }
-        else
-        {
-            //death handling 
-            //eggPersonController.ToggleRagdoll(true);
-            this.enabled = false;
         }
 
 
@@ -181,7 +191,7 @@ public class NpcController : MonoBehaviour
 
                 if (distance < swingDistance)
                 {
-                    if (eggPersonController.swinging && SwingPrimeCounter > SwingPrimeTime)
+                    if (eggPersonController.swinging && SwingPrimeCounter > SwingPrimeTime && !eggPersonController.swingCooldown)
                     {
                         combatController.ReleaseSwing();
                         SwingPrimeCounter = 0;
@@ -369,4 +379,6 @@ public class NpcController : MonoBehaviour
             }
         }
     }
+
+    
 }

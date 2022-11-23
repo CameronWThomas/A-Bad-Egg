@@ -37,6 +37,7 @@ public class CombatController : MonoBehaviour
 
     public void ReleaseSwing()
     {
+        eggPersonController.swingCooldown = true;
         targetYaw = yaw - 180;
         targetPitch = pitch;
         swingReleased = true;
@@ -45,7 +46,7 @@ public class CombatController : MonoBehaviour
 
     public void StopSwinging()
     {
-
+        eggPersonController.eggAnimator.SetSwinging(false); 
         eggPersonController.swinging = false;
         eggPersonController.mountPoint.swinging = false;
         yaw = 0;
@@ -54,7 +55,6 @@ public class CombatController : MonoBehaviour
         targetPitch = 0;
         yAtRelease = 0;
         //camController.SetCombatMode(eggPersonController.swinging);
-        eggPersonController.eggAnimator.SetSwinging(false);
         currentRotation = new Vector3(0, 0, 0);
     }
     public void RotateToTarget()
