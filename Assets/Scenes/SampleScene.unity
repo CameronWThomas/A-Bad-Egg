@@ -18108,7 +18108,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 503365328}
   combatTarget: {fileID: 202540906}
-  lockCursor: 0
+  lockCursor: 1
   softLocked: 0
   pitchMinMax: {x: -40, y: 85}
   rotationSmoothTime: 0.12
@@ -27007,6 +27007,7 @@ MonoBehaviour:
   playerController: {fileID: 0}
   swingCooldownTimer: 0.8
   swingCooldown: 0
+  navMeshAgent: {fileID: 0}
   fallingToDeath: 0
 --- !u!114 &1829287279
 MonoBehaviour:

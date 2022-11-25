@@ -73,16 +73,17 @@ public class EggPersonController : MonoBehaviour
     public float swingCooldownTimer = 0.8f;
     public bool swingCooldown = false;
 
-    NavMeshAgent navMeshAgent;
+   public NavMeshAgent navMeshAgent;
 
     float FALLING_THRESHOLD = -20f;
     float RAGDOLL_FALLING_THRESHOLD = -2f;
     public bool fallingToDeath = false;
     bool isJumping;
+    Vector3 newPos;
     void Start()
     {
         invulnTimer = 3f;
-        ragdollTimer = 10f;
+        ragdollTimer = 6f;
         swingCooldownTimer = 0.8f;
         controller = GetComponent<CharacterController>();
         eggAnimator = GetComponent<EggAnimator>();
@@ -181,7 +182,7 @@ public class EggPersonController : MonoBehaviour
                     impactPoint = splodePoint;
                     away = (epc.transform.position - splodePoint).normalized;
                     force = forceSpeed;
-                    epc.rbody.AddForce(away);
+                    epc.rbody.AddForce(away, ForceMode.Impulse);
                 }
             }
             
@@ -349,13 +350,19 @@ public class EggPersonController : MonoBehaviour
         rolling = false;
         isRagdolled = false;
         ToggleRagdoll(false);
+
         //rb.useGravity = false;
         //rb.isKinematic = true;
         //controller.enabled = !rolling;
         //eggAnimator.animator.enabled = !rolling;
 
     }
+    public void SetPosToNewPos()
+    {
 
+        transform.position = new Vector3(newPos.x, newPos.y + 0.1f, newPos.z);
+        Physics.SyncTransforms();
+    }
     public void StopRollingNPC()
     {
         SetPosToCoreNPC();
@@ -363,6 +370,7 @@ public class EggPersonController : MonoBehaviour
         rolling = false;
         isRagdolled = false;
         ToggleRagdoll(false);
+
         //rb.useGravity = false;
         //rb.isKinematic = true;
         //controller.enabled = !rolling;
@@ -439,8 +447,10 @@ public class EggPersonController : MonoBehaviour
     void SetPosToCore()
     {
 
-        Vector3 newPos = epc.transform.position;
-        transform.position = new Vector3(newPos.x, newPos.y + 0.1f, newPos.z) ;
+        newPos = epc.transform.position;
+        //transform.position = new Vector3(newPos.x, newPos.y + 0.1f, newPos.z) ;
+        SetPosToNewPos();
+
     }
     void SetPosToCoreNPC()
     {

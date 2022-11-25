@@ -39,6 +39,12 @@ public class CameraController : MonoBehaviour
         //offset = transform.position - target.transform.position;
         playerController = GameObject.FindObjectOfType<PlayerController>();
         worldManager = GameObject.FindObjectOfType<WorldManager>();
+
+        if (lockCursor)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     void Update()
@@ -55,6 +61,14 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            lockCursor = !lockCursor;
+
+            Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
+            Cursor.visible = lockCursor;
+        }
+
         if (!locked && !softLocked)
         {
            

@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
     {
         //Debug.Log(eggPersonController.epc.rbody.velocity);
         //Debug.Log(eggPersonController.controller.velocity);
-
+        
         if (!initialStatusFix)
         {
             initialStatusFix = true;
@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
         if (eggPersonController.health > 0 && !eggPersonController.fallingToDeath)
         {
 
-            if (eggPersonController.isRagdolled || eggPersonController.rolling)
+            if (eggPersonController.IsRagdolling())
             {
                 eggPersonController.ragdollCounter += Time.deltaTime;
                 if (eggPersonController.ragdollCounter > eggPersonController.ragdollTimer)
@@ -108,7 +108,7 @@ public class PlayerController : MonoBehaviour
                 
             }
         }
-        else
+        else if(eggPersonController.health == 0)
         {
             //death handling 
             //eggPersonController.ToggleRagdoll(true);

@@ -17,6 +17,7 @@ public class KillByFallController : MonoBehaviour
     public float currHeight;
 
     float fallHeight = 8f;
+    int frame = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -26,7 +27,7 @@ public class KillByFallController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        frame++;
         heightCounter += Time.deltaTime;
         if(heightCounter > heightTimer)
         {
@@ -66,9 +67,23 @@ public class KillByFallController : MonoBehaviour
                 initHeight = me.epc.transform.position.y;
             }
         }
+        if (me.navMeshAgent != null && !me.IsRagdolling()) 
+        {
+            initHeight = me.epc.transform.position.y;
+        }
 
         if (me.fallingToDeath && me.health != 0)
         {
+            Vector3 pos = me.epc.transform.position;
+            float terrainHeight = Terrain.activeTerrain.SampleHeight(transform.position);
+
+            if (pos.y - terrainHeight <= Mathf.Abs(1.2f))
+            {
+                Vector3 forcePos = me.epc.transform.position;
+                forcePos.y += 1;
+                me.OnHit(20f, forcePos, true);
+            }
+
             timer += Time.deltaTime;
             if(timer > counter && me.fallingToDeath)
             {
@@ -89,15 +104,7 @@ public class KillByFallController : MonoBehaviour
                 }
 
             }
-            Vector3 pos = transform.position;
-            float terrainHeight = Terrain.activeTerrain.SampleHeight(transform.position);
-
-            if (pos.y - terrainHeight <= Mathf.Abs(1.2f))
-            {
-                Vector3 forcePos = me.epc.transform.position;
-                forcePos.y += 1;
-                me.OnHit(20f, forcePos, true);
-            }
+            
         }
     }
 
