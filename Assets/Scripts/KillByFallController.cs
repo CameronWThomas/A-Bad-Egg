@@ -18,6 +18,8 @@ public class KillByFallController : MonoBehaviour
 
     float fallHeight = 8f;
     int frame = 0;
+
+    public float terrainHeight;
     // Start is called before the first frame update
     void Start()
     {
@@ -74,13 +76,13 @@ public class KillByFallController : MonoBehaviour
 
         if (me.fallingToDeath && me.health != 0)
         {
-            Vector3 pos = me.epc.transform.position;
-            float terrainHeight = Terrain.activeTerrain.SampleHeight(transform.position);
+            //Vector3 pos = me.epc.transform.position;
+            terrainHeight = Terrain.activeTerrain.SampleHeight(transform.position);
 
-            if (pos.y - terrainHeight <= Mathf.Abs(1.2f))
+            if (Mathf.Abs(currHeight - terrainHeight) <= 2.0f)
             {
                 Vector3 forcePos = me.epc.transform.position;
-                forcePos.y += 1;
+                forcePos.y += 2;
                 me.OnHit(20f, forcePos, true);
             }
 

@@ -7,6 +7,7 @@ using UnityEngine.AI;
 public class EggPersonController : MonoBehaviour
 {
     public CharacterController controller;
+
     public float walkSpeed = 5;
     public float runSpeed = 10;
     public bool running = false;
@@ -80,6 +81,9 @@ public class EggPersonController : MonoBehaviour
     public bool fallingToDeath = false;
     bool isJumping;
     Vector3 newPos;
+
+
+    AudioController audio;
     void Start()
     {
         invulnTimer = 3f;
@@ -89,6 +93,7 @@ public class EggPersonController : MonoBehaviour
         eggAnimator = GetComponent<EggAnimator>();
 
         wm = GameObject.FindObjectOfType<WorldManager>();
+        audio = GameObject.FindObjectOfType<AudioController>();
         //rb = GetComponent<Rigidbody>();
 
         myMace = GetComponentInChildren<WeildedMace>();
@@ -157,7 +162,7 @@ public class EggPersonController : MonoBehaviour
     }
     public void OnHit(float forceSpeed, Vector3 splodePoint, bool instaDeath = false)
     {
-        if (invuln)
+        if (invuln && !instaDeath)
         {
 
         }
@@ -212,6 +217,7 @@ public class EggPersonController : MonoBehaviour
     }
     public void SwapToShattered(float speed, Vector3 splodePoint)
     {
+        audio.PlayRandomSplat();
         if (rolling)
         {
             ConsumeChildren();

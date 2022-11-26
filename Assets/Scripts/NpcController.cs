@@ -42,7 +42,7 @@ public class NpcController : MonoBehaviour
     float primeDistance = 50f;
 
     int startingHealth = -1;
-    float SwingPrimeTime = 4f;
+    float SwingPrimeTime = 10f;
     float SwingPrimeCounter = 0f;
     // Start is called before the first frame update
     void Start()
@@ -182,22 +182,24 @@ public class NpcController : MonoBehaviour
             float distance = (transform.position - target.position).magnitude;
             if(distance < primeDistance)
             {
-                SwingPrimeCounter++;
                 if (!eggPersonController.swinging)
                 {
                     combatController.PrimeSwing();
                     eggPersonController.swinging = true;
                     eggPersonController.mountPoint.swinging = true;
+                    SwingPrimeCounter = 0;
                     //camController.SetCombatMode(eggPersonController.swinging);
                     eggPersonController.eggAnimator.SetSwinging(true);
                 }
 
                 if (distance < swingDistance)
                 {
+                    SwingPrimeCounter++;
                     if (eggPersonController.swinging && SwingPrimeCounter > SwingPrimeTime && !eggPersonController.swingCooldown)
                     {
-                        combatController.ReleaseSwing();
                         SwingPrimeCounter = 0;
+                        combatController.ReleaseSwing();
+                        eggPersonController.swinging = false;
                     }
                 }
 
