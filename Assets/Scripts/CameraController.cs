@@ -61,12 +61,29 @@ public class CameraController : MonoBehaviour
     {
         combatMode = engaged;
     }
+
+    public void LockCursor() 
+    {
+        lockCursor = true;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    public void UnlockCursor()
+    {
+        lockCursor = false;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
     // Update is called once per frame
     void LateUpdate()
     {
 
         if (SceneManager.GetActiveScene().name == "SampleScene")
         {
+            /*
             if (Input.GetKeyUp(KeyCode.Escape))
             {
                 lockCursor = !lockCursor;
@@ -74,7 +91,7 @@ public class CameraController : MonoBehaviour
                 Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
                 Cursor.visible = lockCursor;
             }
-
+            */
             if (!locked && !softLocked)
             {
 

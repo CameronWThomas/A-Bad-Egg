@@ -35,6 +35,10 @@ public class HUD : MonoBehaviour
     private float ResetTimer = 0f;
     private float ResetCooldown = 20f;
 
+    CameraController cameraController;
+
+
+    bool paused = false;
     string[] inBetween = new string[] { 
         "Cool",
         "Good job.",
@@ -57,11 +61,38 @@ public class HUD : MonoBehaviour
 
         tutorialSpace = new Rect(Screen.width / 2 + 150, Screen.height / 3, 200, 200);
         centralManifold = new Rect(Screen.width / 2 - 100, Screen.height / 3, 200, 200);
+
+        cameraController = Camera.main.GetComponent<CameraController>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (paused)
+        {
+            Time.timeScale = 0;
+            if (Input.GetKeyUp(KeyCode.Q))
+            {
+                Application.Quit();
+            }
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            if (cameraController.lockCursor)
+            {
+                cameraController.UnlockCursor();
+                paused = true;
+            }
+            else
+            {
+                cameraController.LockCursor();
+                paused = false;
+            }
+        }
         if (isTiming && !Tutorialized)
         {
             Timer += Time.deltaTime;
@@ -120,61 +151,68 @@ public class HUD : MonoBehaviour
         hudGuiStyle = guiSkin.GetStyle("counterBold");
     }
 
+
     private void OnGUI()
     {
-        GUI.skin = guiSkin;
-        GUI.Label(new Rect(0, 0, 200, 200), manager.killedEnemies + " / " + manager.NumEnemies, hudGuiStyle);
-        GUI.Label(new Rect(Screen.width - 200, 0, 200, 200), "\"R\"= Restart");
-
-        if (!Tutorialized)
+        if (paused)
         {
-            if (Timer < Cooldown && isTiming)
-            {
-                GUI.Label(tutorialSpace, inBetween[inBetweenCounter], promptGuiStyle);
-            }
-            else
-            {
-                if (!walked)
-                {
-                    GUI.Label(tutorialSpace, "WASD to walk", promptGuiStyle);
-                }
-                else if (!runned)
-                {
-                    GUI.Label(tutorialSpace, "Left SHIFT to running", promptGuiStyle);
-                }
-                else if (!jumped)
-                {
-                    GUI.Label(tutorialSpace, "SPACE to (sometimes) jump", promptGuiStyle);
-                }
-                else if (!primed)
-                {
+            GUI.Label(centralManifold, "ESC: Unpause\nQ: Quit", yellGuiStyle);
+        }
+        else
+        {
+            GUI.skin = guiSkin;
+            GUI.Label(new Rect(0, 0, 200, 200), manager.killedEnemies + " / " + manager.NumEnemies, hudGuiStyle);
+            GUI.Label(new Rect(Screen.width - 200, 0, 200, 200), "\"R\"= Restart");
 
-                    GUI.Label(tutorialSpace, "Left Click To Prime a Strike", promptGuiStyle);
-                }
-                else if (!swung)
+            if (!Tutorialized)
+            {
+                if (Timer < Cooldown && isTiming)
                 {
-
-                    GUI.Label(tutorialSpace, "Release Left Click To Swing", promptGuiStyle);
+                    GUI.Label(tutorialSpace, inBetween[inBetweenCounter], promptGuiStyle);
                 }
-                else if (!reset)
+                else
                 {
-                    ResetTimer += Time.deltaTime;
-                    if(ResetTimer >= ResetCooldown)
+                    if (!walked)
                     {
-                        inBetween[5] = "Or dont. Doesnt matter to me.";
-                        AckReset();
+                        GUI.Label(tutorialSpace, "WASD to walk", promptGuiStyle);
                     }
-                    GUI.Label(tutorialSpace, "\"R\" to reset the level & progress.", promptGuiStyle);
+                    else if (!runned)
+                    {
+                        GUI.Label(tutorialSpace, "Left SHIFT to running", promptGuiStyle);
+                    }
+                    else if (!jumped)
+                    {
+                        GUI.Label(tutorialSpace, "SPACE to (sometimes) jump", promptGuiStyle);
+                    }
+                    else if (!primed)
+                    {
+
+                        GUI.Label(tutorialSpace, "Left Click To Prime a Strike", promptGuiStyle);
+                    }
+                    else if (!swung)
+                    {
+
+                        GUI.Label(tutorialSpace, "Release Left Click To Swing", promptGuiStyle);
+                    }
+                    else if (!reset)
+                    {
+                        ResetTimer += Time.deltaTime;
+                        if (ResetTimer >= ResetCooldown)
+                        {
+                            inBetween[5] = "Or dont. Doesnt matter to me.";
+                            AckReset();
+                        }
+                        GUI.Label(tutorialSpace, "\"R\" to reset the level & progress.", promptGuiStyle);
+                    }
                 }
             }
-        }
-        
-        if (hasWon)
-        {
-            Tutorialized = true;
-            GUI.Label(centralManifold, "Congrats!! you're a rotten egg!", yellGuiStyle);
-        }
 
+            if (hasWon)
+            {
+                Tutorialized = true;
+                GUI.Label(centralManifold, "Congrats!! you're a rotten egg!", yellGuiStyle);
+            }
+        }
     }
 
     public void AckWalk()

@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
 
                 }
 
-
+                /*
                 //armed / unarmed
                 if (Input.GetKeyUp(KeyCode.F))
                 {
@@ -87,7 +87,7 @@ public class PlayerController : MonoBehaviour
                     eggPersonController.eggAnimator.SetArmed(eggPersonController.armed);
                     eggPersonController.myMace.SetVisible(eggPersonController.armed);
                 }
-                    
+                */  
                 if (eggPersonController.armed && Input.GetMouseButtonDown(0) && !combatController.swingReleased && !eggPersonController.swingCooldown)
                 {
                     if (!eggPersonController.swinging)

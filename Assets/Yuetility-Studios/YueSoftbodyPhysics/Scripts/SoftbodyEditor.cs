@@ -5,7 +5,7 @@ using YuetilitySoftbody;
 
 namespace YuetilitySoftbody
 {
-
+    #if UNITY_EDTIOR
     // Editor
     [CustomEditor(typeof(YueSoftbodyPhysics))]
 
@@ -69,4 +69,5 @@ namespace YuetilitySoftbody
 
         }
     }
+    #endif
 }
