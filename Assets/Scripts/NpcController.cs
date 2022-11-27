@@ -38,12 +38,17 @@ public class NpcController : MonoBehaviour
     int frames = 0;
 
 
+    Vector2 swingDistanceRange = new Vector2(7f, 12f);
     float swingDistance = 10f;
     float primeDistance = 50f;
 
     int startingHealth = -1;
-    float SwingPrimeTime = 10f;
-    float SwingPrimeCounter = 0f;
+    Vector2 SwingPrimeTimeRange = new Vector2(1f, 5f);
+    public float SwingPrimeTime = 3f;
+    public float SwingPrimeCounter = 0f;
+
+    public float MustReleaseTime = 15f;
+    public float MustReleaseCounter = 0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -68,6 +73,9 @@ public class NpcController : MonoBehaviour
         }
 
         startingHealth = eggPersonController.health;
+
+        SetNewSwingDistance();
+        SetNewPrimeTime();
     }
     // Update is called once per frame
     void LateUpdate()
@@ -162,13 +170,20 @@ public class NpcController : MonoBehaviour
 
 
     }
-
+    void SetNewSwingDistance()
+    {
+        swingDistance = Random.Range(swingDistanceRange.x, swingDistanceRange.y);
+    }
+    void SetNewPrimeTime()
+    {
+        SwingPrimeTime = Random.Range(SwingPrimeTimeRange.x, SwingPrimeTimeRange.y);
+    }
     void SeekAndDestroy()
     {
         //determine if we sould stop attacking
         //look for player manager
         frames++;
-        if (frames % 20 == 0)
+        if (frames % 5 == 0)
         {
             frames = 0;
             viewDistance = 20f * eggPersonController.wm.killedEnemies;
@@ -182,6 +197,7 @@ public class NpcController : MonoBehaviour
             float distance = (transform.position - target.position).magnitude;
             if(distance < primeDistance)
             {
+                SwingPrimeCounter += Time.deltaTime;
                 if (!eggPersonController.swinging)
                 {
                     combatController.PrimeSwing();
@@ -191,15 +207,33 @@ public class NpcController : MonoBehaviour
                     //camController.SetCombatMode(eggPersonController.swinging);
                     eggPersonController.eggAnimator.SetSwinging(true);
                 }
+                else
+                {
+                    MustReleaseCounter += Time.deltaTime;
+                }
 
                 if (distance < swingDistance)
                 {
-                    SwingPrimeCounter++;
                     if (eggPersonController.swinging && SwingPrimeCounter > SwingPrimeTime && !eggPersonController.swingCooldown)
                     {
                         SwingPrimeCounter = 0;
                         combatController.ReleaseSwing();
                         eggPersonController.swinging = false;
+
+                        SetNewSwingDistance();
+                        SetNewPrimeTime();
+                    }
+                }else if(MustReleaseCounter >= MustReleaseTime)
+                {
+                    if (eggPersonController.swinging && !eggPersonController.swingCooldown)
+                    {
+                        SwingPrimeCounter = 0;
+                        combatController.ReleaseSwing();
+                        eggPersonController.swinging = false;
+
+                        SetNewSwingDistance();
+                        SetNewPrimeTime();
+                        MustReleaseCounter = 0;
                     }
                 }
 
@@ -207,6 +241,8 @@ public class NpcController : MonoBehaviour
         }
         PathfindToTarget();
     }
+
+    
 
     void StandardNavigation()
     {
@@ -309,9 +345,10 @@ public class NpcController : MonoBehaviour
         EggPersonController player = target.GetComponent<EggPersonController>();
         if(player == null)
         {
+            targetingPlayer = false;
             SetTargetToNextPathMarker();
         }
-        else if(player.health == 0 || player.rolling || player.ragdolled)
+        else if(player.health == 0 || player.IsRagdolling())
         {
             targetingPlayer = false;
             SetTargetToRandomTravelMarker();

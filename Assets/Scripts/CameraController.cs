@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CameraController : MonoBehaviour
 {
@@ -49,10 +50,12 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
+        /*
         if (Input.GetKeyUp(KeyCode.L))
         {
             locked = !locked;
         }
+        */
     }
     public void SetCombatMode(bool engaged)
     {
@@ -61,30 +64,33 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void LateUpdate()
     {
-        if (Input.GetKeyUp(KeyCode.Escape))
+
+        if (SceneManager.GetActiveScene().name == "SampleScene")
         {
-            lockCursor = !lockCursor;
-
-            Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
-            Cursor.visible = lockCursor;
-        }
-
-        if (!locked && !softLocked)
-        {
-           
-
-            //transform.position = player.transform.position + offset;
-            /*
-            if (combatMode)
+            if (Input.GetKeyUp(KeyCode.Escape))
             {
-                //transform.position = (combatTarget.transform.position) - transform.forward * dstFromTarget;
-                currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
-                transform.position = (target.transform.position) - transform.forward * dstFromTarget;
-                //transform.forward = playerController.transform.forward;
+                lockCursor = !lockCursor;
+
+                Cursor.lockState = lockCursor ? CursorLockMode.Locked : CursorLockMode.None;
+                Cursor.visible = lockCursor;
             }
-            else
+
+            if (!locked && !softLocked)
             {
-            */
+
+
+                //transform.position = player.transform.position + offset;
+                /*
+                if (combatMode)
+                {
+                    //transform.position = (combatTarget.transform.position) - transform.forward * dstFromTarget;
+                    currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
+                    transform.position = (target.transform.position) - transform.forward * dstFromTarget;
+                    //transform.forward = playerController.transform.forward;
+                }
+                else
+                {
+                */
                 yaw += Input.GetAxis("Mouse X") * worldManager.mouseSensitivity;
                 pitch -= Input.GetAxis("Mouse Y") * worldManager.mouseSensitivity;
                 pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
@@ -94,19 +100,21 @@ public class CameraController : MonoBehaviour
 
                 transform.position = (target.transform.position) - transform.forward * dstFromTarget;
                 //transform.position = target.transform.position;
-            //}
+                //}
 
 
-            //camera distance
-            dstFromTarget -= Input.mouseScrollDelta.y * scrollScale;
-            dstFromTarget = Mathf.Clamp(dstFromTarget, dstMinMax.x, dstMinMax.y);
-        }else if (softLocked)
-        {
-            yaw += Input.GetAxis("Mouse X") * worldManager.mouseSensitivity;
-            pitch -= Input.GetAxis("Mouse Y") * worldManager.mouseSensitivity;
-            pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
-            currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
-            transform.eulerAngles = currentRotation;
+                //camera distance
+                dstFromTarget -= Input.mouseScrollDelta.y * scrollScale;
+                dstFromTarget = Mathf.Clamp(dstFromTarget, dstMinMax.x, dstMinMax.y);
+            }
+            else if (softLocked)
+            {
+                yaw += Input.GetAxis("Mouse X") * worldManager.mouseSensitivity;
+                pitch -= Input.GetAxis("Mouse Y") * worldManager.mouseSensitivity;
+                pitch = Mathf.Clamp(pitch, pitchMinMax.x, pitchMinMax.y);
+                currentRotation = Vector3.SmoothDamp(currentRotation, new Vector3(pitch, yaw), ref rotationSmoothVelocity, rotationSmoothTime);
+                transform.eulerAngles = currentRotation;
+            }
         }
 
     }

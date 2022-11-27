@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 153875
+  controlID: 167190
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -91,7 +91,7 @@ MonoBehaviour:
     m_HSlider: 0
     m_VSlider: 0
     m_IgnoreScrollWheelUntilClicked: 0
-    m_EnableMouseInput: 0
+    m_EnableMouseInput: 1
     m_EnableSliderZoomHorizontal: 0
     m_EnableSliderZoomVertical: 0
     m_UniformScale: 1
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 153876
+  controlID: 167191
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -173,7 +173,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 153877
+  controlID: 167192
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -233,7 +233,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 9c8ef2ffdc24f6ffa026f6ff16a7f9ff4c46fdff5846fdff926c00009c6c0000b86e0000c06f0000d470000002710600388006006c860600e08b06000a9706002ea006008aa50600f0bb06001cbf0600
+      m_ExpandedIDs: 6e70ecff2ac2efff32c2efff46c2efff52c2efff80d8efff84efefff9c8ef2ffdc24f6ffa026f6ff16a7f9ff4c46fdff5846fdfff4ffffff926c00009c6c0000b86e0000c06f0000d470000002710600388006006c860600e08b06000a9706002ea006008aa50600f0bb06001cbf0600b4e91700d0e917006c191800461a1800f82018006e211800
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -544,9 +544,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 0.57398415, y: -2.2652202, z: -15.768103}
+    m_Target: {x: 187.00186, y: 29.25663, z: -145.13953}
     speed: 2
-    m_Value: {x: 0.57398415, y: -2.2652202, z: -15.768103}
+    m_Value: {x: 187.00186, y: 29.25663, z: -145.13953}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -592,13 +592,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.01636263, y: 0.98257166, z: -0.15241842, w: 0.10533497}
+    m_Target: {x: -0.48187086, y: 0.23512821, z: -0.1360271, w: -0.83309907}
     speed: 2
-    m_Value: {x: 0.01636229, y: 0.9825513, z: -0.15241526, w: 0.105332784}
+    m_Value: {x: -0.4818607, y: 0.23512325, z: -0.13602422, w: -0.8330815}
   m_Size:
-    m_Target: 10
+    m_Target: 41.84905
     speed: 2
-    m_Value: 10
+    m_Value: 41.84905
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -2867,21 +2867,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts
+    - Assets/GUI
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/GUI
   m_LastFoldersGridSize: -1
   m_LastProjectPath: D:\Programs\GameDev\UnityProjects\A Bad Egg
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 79}
-    m_SelectedIDs: 9e780000
-    m_LastClickedID: 30878
+    m_SelectedIDs: 8efb1d00
+    m_LastClickedID: 1964942
     m_ExpandedIDs: 00000000e8760000ea760000ee760000887800008a7800008e78000090780000e4760200e676020040c0060000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -2954,7 +2954,7 @@ MonoBehaviour:
       m_IsRenaming: 0
       m_OriginalEventType: 11
       m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 11}
+      m_ClientGUIView: {fileID: 7}
     m_CreateAssetUtility:
       m_EndAction: {fileID: 0}
       m_InstanceID: 0

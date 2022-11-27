@@ -58,7 +58,14 @@ public class PlayerController : MonoBehaviour
                 Vector2 inputDir = input.normalized;
                 eggPersonController.running = Input.GetKey(KeyCode.LeftShift);
 
-                
+                if(inputDir.x !=0 || inputDir.y != 0)
+                {
+                    worldManager.hud.AckWalk();
+                }
+                if (eggPersonController.running)
+                {
+                    worldManager.hud.AckRun();
+                }
                 
 
 
@@ -85,6 +92,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if (!eggPersonController.swinging)
                     {
+                        worldManager.hud.AckPrimed();
                         combatController.PrimeSwing();
                         eggPersonController.swinging = true;
                         eggPersonController.mountPoint.swinging = true;
@@ -94,6 +102,7 @@ public class PlayerController : MonoBehaviour
                 }
                 if (eggPersonController.armed && Input.GetMouseButtonUp(0) && eggPersonController.swinging)
                 {
+                    worldManager.hud.AckSwing();
                     combatController.ReleaseSwing();
                 }
 
@@ -102,6 +111,7 @@ public class PlayerController : MonoBehaviour
                 {
                     eggPersonController.Jump();
                     eggPersonController.eggAnimator.OnJumping();
+                    worldManager.hud.AckJump();
                 }
                 
 

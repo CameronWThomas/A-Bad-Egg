@@ -231,7 +231,7 @@ public class EggPersonController : MonoBehaviour
             // ...
         }
 
-        wm.killedEnemies++;
+        wm.KilledEnemy();
         NpcController npc = GetComponent<NpcController>();
         controller.enabled = false;
         if (npc != null)
