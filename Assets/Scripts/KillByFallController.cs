@@ -82,7 +82,7 @@ public class KillByFallController : MonoBehaviour
             if (Mathf.Abs(currHeight - terrainHeight) <= 2.0f)
             {
                 Vector3 forcePos = me.epc.transform.position;
-                forcePos.y += 2;
+                forcePos.y += 5;
                 me.OnHit(20f, forcePos, true);
             }
 

@@ -7,8 +7,12 @@ public class AudioController : MonoBehaviour
     public List<AudioSource> splats;
     public List<AudioSource> screams;
 
+    AudioSource heap;
     //float numSplats = 1;
     public float screamPercentChance = 10;
+    private GameObject[] other;
+    private bool NotFirst = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,12 +35,43 @@ public class AudioController : MonoBehaviour
                 screams.Add(scream);
             }
         }
+
+        if(heap == null)
+        {
+            heap = GetComponent<AudioSource>();
+        }
+        if (!heap.isPlaying)
+        {
+            heap.Play();
+        }
+
+       
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+    void Awake()
+    {
+        other = GameObject.FindGameObjectsWithTag("Music");
+
+        foreach (GameObject oneOther in other)
+        {
+            if (oneOther.scene.buildIndex == -1)
+            {
+                NotFirst = true;
+            }
+        }
+
+        if (NotFirst == true)
+        {
+            Destroy(gameObject);
+        }
+        DontDestroyOnLoad(this);
+        heap = GetComponent<AudioSource>();
+
     }
 
     bool ShouldScream()

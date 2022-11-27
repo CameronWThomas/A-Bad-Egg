@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WorldManager : MonoBehaviour
 {
@@ -27,7 +28,7 @@ public class WorldManager : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.R))
         {
-            Application.LoadLevel(Application.loadedLevel);
+            SceneManager.LoadScene(Application.loadedLevel);
         }
     }
 }
