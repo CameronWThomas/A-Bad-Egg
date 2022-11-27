@@ -210,7 +210,7 @@ public class HUD : MonoBehaviour
         {
             primed = true;
             isTiming = true;
-            Cooldown = 3f;
+            Cooldown = 1f;
             inBetweenCounter++;
         }
     }
